@@ -275,7 +275,7 @@ const App = () => {
         </Element>
         <Element
           name="Projects"
-          className="min-h-screen w-full flex flex-col justify-start items-center p-3 lg:pt-24 "
+          className="min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24 "
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">PROJECTS</h1>
@@ -480,7 +480,7 @@ const App = () => {
             ))}
           </div>
         </Element>
-        <Element name="Contact" className="h-screen w-full flex flex-col justify-center items-center p-3 lg:pt-24">
+        <Element name="Contact" className="h-screen w-full flex flex-col justify-center items-center p-3 pt-24">
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
             <div className="w-[180px] my-2 border-2 border-[#6609b3] "></div>
