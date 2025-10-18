@@ -37,8 +37,8 @@ const Navbar = () => {
         </a>
       </div>
     </div>
-    <div className="flex justify-between w-full  px-3 fixed top-5 lg:hidden block  items-center">
-      <div className=" bg-gray-400/15 p-3 rounded-full border backdrop-blur-md border-white border-opacity-30">
+    <div className="flex justify-between w-full z-[99]  px-3 fixed top-5 lg:hidden block  items-center">
+      <div className=" bg-gray-400/15 px-3 py-2 rounded-full border backdrop-blur-md border-white border-opacity-30">
         <ShinyText
           text="Hatim Malak"
           disabled={false}

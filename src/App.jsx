@@ -8,9 +8,8 @@ import Particles from "./components/Particeles.jsx";
 import { useRef } from "react";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
-import { Loader, ExternalLink,X } from "lucide-react";
+import { Loader, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
-
 
 const App = () => {
   const form = useRef();
@@ -55,8 +54,8 @@ const App = () => {
                   project’s modular codebase allows easy expansion for future
                   features like group chats, file sharing, and authentication.`,
       skills: ["React.js", "Tailwindcss", "Node.js", "Express.js", "Socket.io"],
-      code:"https://github.com/Hatim-Malak/officalchat",
-      live:"https://officalchat.onrender.com/"
+      code: "https://github.com/Hatim-Malak/officalchat",
+      live: "https://officalchat.onrender.com/",
     },
     {
       id: 1,
@@ -71,8 +70,8 @@ const App = () => {
                   cancellation. The deployment ensures fast, scalable, and
                   reliable performance with seamless database integration.`,
       skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
-      code:"https://github.com/Hatim-Malak/Starlit_Stationary-app",
-      live:"https://starlit-stationary-frontend.vercel.app/"
+      code: "https://github.com/Hatim-Malak/Starlit_Stationary-app",
+      live: "https://starlit-stationary-frontend.vercel.app/",
     },
     {
       id: 2,
@@ -86,8 +85,8 @@ const App = () => {
                   scalable performance for an engaging digital reading
                   experience.`,
       skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
-      code:"https://github.com/Hatim-Malak/E-book",
-      live:"https://e-book-psi-nine.vercel.app/"
+      code: "https://github.com/Hatim-Malak/E-book",
+      live: "https://e-book-psi-nine.vercel.app/",
     },
   ];
   const education = [
@@ -328,24 +327,25 @@ const App = () => {
         </Element>
         <Element
           name="Projects"
-          className={`min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24 `}
+          className={`min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24`}
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">PROJECTS</h1>
             <div className="w-[150px] my-2 border-2 border-[#6609b3] "></div>
             <p className="text-white text-xl font-semibold text-center my-3">
-              A showcase of the project, I have worked on, highlighting my
-              skills on technologies
+              A showcase of the projects I have worked on, highlighting my
+              skills and technologies.
             </p>
           </div>
-          <div className=" relative flex lg:flex-row flex-col mt-5 gap-8 justify-center items-center w-full h-full transition-all ">
+
+          <div className="relative flex lg:flex-row flex-col mt-5 gap-8 justify-center items-center w-full h-full transition-all">
             {projects.map((pro) => (
-              <>
+              <React.Fragment key={pro.id}>
                 {openpro !== pro.id ? (
+                  // Normal Project Card
                   <div
                     onClick={() => setopenpro(pro.id)}
-                    key={pro.id}
-                    className="w-[300px] h-[500px]  transition-all flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg"
+                    className="w-[300px] h-[500px] transition-all flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg cursor-pointer hover:scale-105 duration-300"
                   >
                     <div className="w-full h-[35%]">
                       <img
@@ -374,55 +374,69 @@ const App = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className={`w-[90%] lg:w-[60%] z-[99] absolute lg:flex-row flex-col h-full rounded-2xl flex bg-gray-800 text-white`}>
-                    <div className="lg:h-full lg:w-[30%] h-[30%] w-full lg:rounded-l-2xl rounded-t-2xl">
-                      <img
-                        src={pro.img}
-                        alt="img"
-                        className="h-full w-full object-cover lg:rounded-l-2xl rounded-t-2xl"
-                      />
-                    </div>
-                    <div className="lg:h-full h-[70%] w-full lg:w-[70%] py-3 lg:px-10 px-5 flex flex-col lg:gap-3 gap-5 items-start justify-center">
-                      <h1 className="text-3xl text-white font-bold flex justify-between w-full items-center">
-                        {pro.name}
-                        <X onClick={()=>setopenpro(false)} className="text-white"/>
-                      </h1>
-                      <p className="text-2xl flex items-center lg:h-[60%] h-[50%] overflow-y-auto text-white font-medium">
-                        {pro.description}
-                      </p>
-                      <div className="lg:flex my-3 grid grid-cols-3 items-center justify-center lg:gap-2 gap-1 ">
-                        {pro.skills.map((skill) => (
-                          <div
-                            key={skill}
-                            className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium"
-                          >
-                            {skill}
-                          </div>
-                        ))}
+                  <div className="fixed inset-0 z-[99] flex justify-center items-center bg-black/60 backdrop-blur-md overflow-y-auto py-10 px-3">
+                    <div className="w-[90%] lg:w-[60%] bg-gray-800 text-white rounded-2xl flex  flex-col lg:flex-row overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                      <div className="lg:w-[30%] w-full h-[250px] lg:h-auto">
+                        <img
+                          src={pro.img}
+                          alt="project"
+                          className="h-full w-full object-cover"
+                        />
                       </div>
-                      <div className="flex items-center justify-around gap-3 w-full">
-                        <a
-                          className="bg-gray-600 text-white text-2xl w-[50%] flex gap-2 justify-center items-center p-3 rounded-2xl font-bold"
-                          href={pro.code}
-                        >
-                          View Code
-                          <ExternalLink className="text-white size-[30px]"  />
-                        </a>
-                        <a
-                          className="bg-[#6609b3] text-white text-2xl w-[50%] flex gap-2 justify-center items-center p-3 rounded-2xl font-bold"
-                          href={pro.live}
-                        >
-                          View Live
-                          <ExternalLink className="text-white size-[30px]" />
-                        </a>
+
+                      <div className="lg:w-[70%] w-full p-6 flex flex-col justify-around gap-5">
+                        <h1 className="text-3xl font-bold flex justify-between items-center">
+                          {pro.name}
+                          <X
+                            onClick={() => setopenpro(null)}
+                            className="cursor-pointer hover:text-red-400"
+                          />
+                        </h1>
+
+                        <p className="text-lg overflow-y-auto max-h-[300px] pr-2">
+                          {pro.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {pro.skills.map((skill) => (
+                            <div
+                              key={skill}
+                              className="px-3 py-1 bg-[#6609b3]/50 rounded-md text-white font-medium"
+                            >
+                              {skill}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex justify-around gap-3 mt-5">
+                          <a
+                            className="bg-gray-600 text-white lg:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
+                            href={pro.code}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View Code
+                            <ExternalLink className="text-white" />
+                          </a>
+                          <a
+                            className="bg-[#6609b3] text-white lg:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
+                            href={pro.live}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View Live
+                            <ExternalLink className="text-white" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </Element>
+
         <Element
           name="Education"
           className="py-24 pb-24 px-[12vw] md:px-[7vw] lg:px-[16vw] font-sans bg-skills-gradient clip-path-custom-3"
