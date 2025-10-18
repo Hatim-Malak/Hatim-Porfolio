@@ -8,15 +8,18 @@ import Particles from "./components/Particeles.jsx";
 import { useRef } from "react";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
-import { Loader } from "lucide-react";
+import { Loader, ExternalLink,X } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 const App = () => {
   const form = useRef();
-  const [load, setload] = useState(false)
+  const [load, setload] = useState(false);
+  const [openpro, setopenpro] = useState(null);
 
   const sendEmail = (e) => {
     e.preventDefault();
-    setload(true)
+    setload(true);
     emailjs
       .sendForm(
         "service_noybm0n",
@@ -28,15 +31,65 @@ const App = () => {
         (result) => {
           console.log(result.text);
           toast.success("Message sent successfully!");
-          setload(false)
+          setload(false);
         },
         (error) => {
           console.log(error.text);
           toast.error("Failed to send message, please try again.");
-          setload(false)
+          setload(false);
         }
       );
   };
+
+  const projects = [
+    {
+      id: 0,
+      img: "./pro1.jpg",
+      name: "OfficalChat",
+      description: ` A real-time chat application built using React, Node.js,
+                  Express, Socket.IO, and TailwindCSS, deployed securely on
+                  Render. It enables instant bidirectional messaging with a
+                  responsive and modern UI for smooth cross-device
+                  communication. The backend efficiently handles live socket
+                  connections, ensuring fast and reliable performance. The
+                  project’s modular codebase allows easy expansion for future
+                  features like group chats, file sharing, and authentication.`,
+      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js", "Socket.io"],
+      code:"https://github.com/Hatim-Malak/officalchat",
+      live:"https://officalchat.onrender.com/"
+    },
+    {
+      id: 1,
+      img: "./pro2.jpg",
+      name: "Starlit Stationary",
+      description: ` A full-stack stationery e-commerce platform built using the
+                  MERN stack with TailwindCSS, deployed on Vercel and Railway.
+                  It features secure authentication, product browsing,
+                  category-based search, and a shopping cart with order
+                  management. An intuitive admin panel allows efficient product
+                  and order control, including user feedback-based order
+                  cancellation. The deployment ensures fast, scalable, and
+                  reliable performance with seamless database integration.`,
+      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
+      code:"https://github.com/Hatim-Malak/Starlit_Stationary-app",
+      live:"https://starlit-stationary-frontend.vercel.app/"
+    },
+    {
+      id: 2,
+      img: "./pro3.png",
+      name: "E-book Reader",
+      description: ` An interactive e-book reader application built using the MERN
+                  stack, allowing users to read books online seamlessly. It
+                  features a clean and responsive UI for distraction-free
+                  reading and smooth navigation between chapters. The platform
+                  ensures fast content loading, secure data handling, and
+                  scalable performance for an engaging digital reading
+                  experience.`,
+      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
+      code:"https://github.com/Hatim-Malak/E-book",
+      live:"https://e-book-psi-nine.vercel.app/"
+    },
+  ];
   const education = [
     {
       id: 1,
@@ -275,7 +328,7 @@ const App = () => {
         </Element>
         <Element
           name="Projects"
-          className="min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24 "
+          className={`min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24 `}
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">PROJECTS</h1>
@@ -285,123 +338,89 @@ const App = () => {
               skills on technologies
             </p>
           </div>
-          <div className=" flex lg:flex-row flex-col mt-5 gap-8 place-items-center ">
-            <div className="w-[300px] h-[500px] flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg">
-              <div className="w-full h-[35%]">
-                <img
-                  src="./pro1.jpg"
-                  alt="pro"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-              <div className="p-3 flex flex-col justify-start gap-2 items-start w-full h-full">
-                <h1 className="text-3xl text-white font-bold text-start">
-                  OfficalChat
-                </h1>
-                <p className="w-full h-[30%] overflow-hidden text-xl text-white font-semibold ">
-                  A real-time chat application built using React, Node.js,
-                  Express, Socket.IO, and TailwindCSS, deployed securely on
-                  Render. It enables instant bidirectional messaging with a
-                  responsive and modern UI for smooth cross-device
-                  communication. The backend efficiently handles live socket
-                  connections, ensuring fast and reliable performance. The
-                  project’s modular codebase allows easy expansion for future
-                  features like group chats, file sharing, and authentication.
-                </p>
-                <div className="grid grid-cols-3 grid-rows-2 items-center justify-center gap-2 mt-2">
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    React.js
+          <div className=" relative flex lg:flex-row flex-col mt-5 gap-8 justify-center items-center w-full h-full transition-all ">
+            {projects.map((pro) => (
+              <>
+                {openpro !== pro.id ? (
+                  <div
+                    onClick={() => setopenpro(pro.id)}
+                    key={pro.id}
+                    className="w-[300px] h-[500px]  transition-all flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg"
+                  >
+                    <div className="w-full h-[35%]">
+                      <img
+                        src={pro.img}
+                        alt="pro"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="p-3 flex flex-col justify-start gap-2 items-start w-full h-full">
+                      <h1 className="text-3xl text-white font-bold text-start">
+                        {pro.name}
+                      </h1>
+                      <p className="w-full h-[30%] overflow-hidden text-xl text-white font-semibold ">
+                        {pro.description}
+                      </p>
+                      <div className="grid grid-cols-3 grid-rows-2 items-center justify-center gap-2 mt-2">
+                        {pro.skills.map((skill) => (
+                          <div
+                            key={skill}
+                            className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium"
+                          >
+                            {skill}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Tailwindcss
+                ) : (
+                  <div className={`w-[90%] lg:w-[60%] z-[99] absolute lg:flex-row flex-col h-full rounded-2xl flex bg-gray-800 text-white`}>
+                    <div className="lg:h-full lg:w-[30%] h-[30%] w-full lg:rounded-l-2xl rounded-t-2xl">
+                      <img
+                        src={pro.img}
+                        alt="img"
+                        className="h-full w-full object-cover lg:rounded-l-2xl rounded-t-2xl"
+                      />
+                    </div>
+                    <div className="lg:h-full h-[70%] w-full lg:w-[70%] py-3 lg:px-10 px-5 flex flex-col lg:gap-3 gap-5 items-start justify-center">
+                      <h1 className="text-3xl text-white font-bold flex justify-between w-full items-center">
+                        {pro.name}
+                        <X onClick={()=>setopenpro(false)} className="text-white"/>
+                      </h1>
+                      <p className="text-2xl flex items-center lg:h-[60%] h-[50%] overflow-y-auto text-white font-medium">
+                        {pro.description}
+                      </p>
+                      <div className="lg:flex my-3 grid grid-cols-3 items-center justify-center lg:gap-2 gap-1 ">
+                        {pro.skills.map((skill) => (
+                          <div
+                            key={skill}
+                            className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium"
+                          >
+                            {skill}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-around gap-3 w-full">
+                        <a
+                          className="bg-gray-600 text-white text-2xl w-[50%] flex gap-2 justify-center items-center p-3 rounded-2xl font-bold"
+                          href={pro.code}
+                        >
+                          View Code
+                          <ExternalLink className="text-white size-[30px]"  />
+                        </a>
+                        <a
+                          className="bg-[#6609b3] text-white text-2xl w-[50%] flex gap-2 justify-center items-center p-3 rounded-2xl font-bold"
+                          href={pro.live}
+                        >
+                          View Live
+                          <ExternalLink className="text-white size-[30px]" />
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Node.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Express.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Socket.io
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="w-[300px] h-[500px] flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg">
-              <div className="w-full h-[35%]">
-                <img
-                  src="./pro2.jpg"
-                  alt="pro"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-              <div className="p-3 flex flex-col justify-start gap-2 items-start w-full h-full">
-                <h1 className="text-3xl text-white font-bold text-start">
-                  Starlit Stationary
-                </h1>
-                <p className="w-full h-[30%] overflow-hidden text-xl text-white font-semibold ">
-                  A full-stack stationery e-commerce platform built using the
-                  MERN stack with TailwindCSS, deployed on Vercel and Railway.
-                  It features secure authentication, product browsing,
-                  category-based search, and a shopping cart with order
-                  management. An intuitive admin panel allows efficient product
-                  and order control, including user feedback-based order
-                  cancellation. The deployment ensures fast, scalable, and
-                  reliable performance with seamless database integration.
-                </p>
-                <div className="grid grid-cols-3 grid-rows-2 items-center justify-center gap-2 mt-2">
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    React.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Tailwindcss
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Node.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Express.js
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="w-[300px] h-[500px] flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg">
-              <div className="w-full h-[35%] mb-8">
-                <img
-                  src="./pro3.png"
-                  alt="pro"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-              <div className="p-3 flex flex-col justify-start gap-2 items-start w-full h-full">
-                <h1 className="text-3xl text-white font-bold text-start">
-                  E-book Reader
-                </h1>
-                <p className="w-full h-[30%] overflow-hidden text-xl text-white font-semibold ">
-                  An interactive e-book reader application built using the MERN
-                  stack, allowing users to read books online seamlessly. It
-                  features a clean and responsive UI for distraction-free
-                  reading and smooth navigation between chapters. The platform
-                  ensures fast content loading, secure data handling, and
-                  scalable performance for an engaging digital reading
-                  experience.
-                </p>
-                <div className="grid grid-cols-3 grid-rows-2 items-center justify-center gap-2 mt-2">
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    React.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Tailwindcss
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Node.js
-                  </div>
-                  <div className="text-md px-2 py-1 flex justify-center rounded-md items-center bg-[#6609b3]/50 text-white font-medium">
-                    Express.js
-                  </div>
-                </div>
-              </div>
-            </div>
+                )}
+              </>
+            ))}
           </div>
         </Element>
         <Element
@@ -480,7 +499,10 @@ const App = () => {
             ))}
           </div>
         </Element>
-        <Element name="Contact" className="h-screen w-full flex flex-col justify-center items-center p-3 pt-24">
+        <Element
+          name="Contact"
+          className="h-screen w-full flex flex-col justify-center items-center p-3 pt-24"
+        >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
             <div className="w-[180px] my-2 border-2 border-[#6609b3] "></div>
@@ -488,8 +510,12 @@ const App = () => {
               I'd love to hear from you - reach out for any opportunities !
             </p>
           </div>
-          
-          <form ref={form} onSubmit={sendEmail} className="flex flex-col h-full w-full justify-start pt-24 items-center gap-3">
+
+          <form
+            ref={form}
+            onSubmit={sendEmail}
+            className="flex flex-col h-full w-full justify-start pt-24 items-center gap-3"
+          >
             <input
               type="text"
               name="from_name"
@@ -514,19 +540,19 @@ const App = () => {
               type="submit"
               className="bg-[#6609b3] lg:w-[30%] w-[90%] text-lg font-semibold text-white p-3 rounded "
             >
-              {load?(
+              {load ? (
                 <div className="flex justify-center items-center gap-2">
-                  <Loader className="animate-spin"/>
+                  <Loader className="animate-spin" />
                   <h1>Loading...</h1>
                 </div>
-              ):(
+              ) : (
                 <h1>Submit</h1>
               )}
             </button>
           </form>
         </Element>
       </div>
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };
