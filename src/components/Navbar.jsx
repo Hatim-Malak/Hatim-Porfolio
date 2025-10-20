@@ -60,8 +60,8 @@ const Navbar = () => {
         <Link to="Projects" className="p-3 cursor-pointer hover:text-white" smooth={true} duration={500}>Projects</Link>
         <Link to="Education" className="p-3 cursor-pointer hover:text-white" smooth={true} duration={500}>Education</Link>
         <Link to="Contact" className="p-3 cursor-pointer hover:text-white" smooth={true} duration={500}>Contact</Link>
-        <a href="" className="p-3 cursor-pointer hover:text-white flex justify-center gap-5 items-center"><Github/> Github</a>
-        <a href="" className="p-3 cursor-pointer hover:text-white flex justify-center gap-5 items-center"><Linkedin/> Linkdin</a>
+        <a href="https://github.com/Hatim-Malak" className="p-3 cursor-pointer hover:text-white flex justify-center gap-5 items-center"><Github/> Github</a>
+        <a href="https://www.linkedin.com/in/hatim-malak-8ba254279/" className="p-3 cursor-pointer hover:text-white flex justify-center gap-5 items-center"><Linkedin/> Linkdin</a>
     </div>)}
 
     </div>

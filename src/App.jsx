@@ -10,6 +10,7 @@ import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
 import { Loader, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import Footer from "./components/Footer.jsx";
 
 const App = () => {
   const form = useRef();
@@ -515,7 +516,7 @@ const App = () => {
         </Element>
         <Element
           name="Contact"
-          className="h-screen w-full flex flex-col justify-center items-center p-3 pt-24"
+          className="h-screen w-full flex flex-col justify-center items-center pt-24"
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
@@ -564,6 +565,7 @@ const App = () => {
               )}
             </button>
           </form>
+          <Footer/>
         </Element>
       </div>
       <Toaster />
