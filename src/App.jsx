@@ -11,7 +11,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { Loader, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "./components/Footer.jsx";
-
 const App = () => {
   const form = useRef();
   const [load, setload] = useState(false);
@@ -210,19 +209,19 @@ const App = () => {
             >
               <h1 className="text-white text-3xl font-bold">Frontend</h1>
               <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[80px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./html1.png" alt="html" />
                 </div>
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./css2.webp" alt="html" />
                 </div>
-                <div className="size-[85px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./javascript.webp" alt="html" />
                 </div>
-                <div className="size-[75px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./React-icon.svg.png" alt="html" />
                 </div>
-                <div className="size-[75px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./tailwindcss-icon.svg" alt="html" />
                 </div>
               </div>
@@ -238,16 +237,16 @@ const App = () => {
             >
               <h1 className="text-white text-3xl font-bold">Backend</h1>
               <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[75px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./node.png" alt="html" />
                 </div>
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./express-js.png" alt="html" />
                 </div>
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./fastapi.svg" alt="html" />
                 </div>
-                <div className="size-[80px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./Socket-io.svg" alt="html" />
                 </div>
               </div>
@@ -263,17 +262,17 @@ const App = () => {
             >
               <h1 className="text-white text-3xl font-bold">Languages</h1>
               <div className="grid grid-cols-3 gap-x-4 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[75px] flex justify-center items-center">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
                   <img src="./c.webp" alt="html" />
                 </div>
-                <div className="size-[67px] flex justify-center items-center">
+                <div className="size-[70px] flex p-3 bg-gray-800 rounded-full justify-center items-center">
                   <img src="./c++.png" alt="html" />
                 </div>
-                <div className="size-[60px] flex justify-center items-center">
-                  <img src="./java.png" alt="html" />
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
+                  <img src="./java.png" alt="html" className="h-[95%] w-[95%]" />
                 </div>
-                <div className="size-[70px] flex justify-center items-center">
-                  <img src="./python.png" alt="html" />
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
+                  <img src="./python.png" alt="html"  />
                 </div>
               </div>
             </Tilt>
@@ -288,16 +287,16 @@ const App = () => {
             >
               <h1 className="text-white text-3xl font-bold">Tools</h1>
               <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./github.png" alt="html" />
                 </div>
-                <div className="size-[85px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./figma.webp" alt="html" />
                 </div>
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./postman.webp" alt="html" />
                 </div>
-                <div className="size-[70px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./swagger-logo.png" alt="html" />
                 </div>
               </div>
@@ -313,13 +312,13 @@ const App = () => {
             >
               <h1 className="text-white text-3xl font-bold">AI Technologies</h1>
               <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[85px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./langchain.webp" alt="html" />
                 </div>
-                <div className="size-[85px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./langgraph (1).png" alt="html" />
                 </div>
-                <div className="size-[85px]">
+                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
                   <img src="./langsmith.png" alt="html" />
                 </div>
               </div>

@@ -3,7 +3,7 @@ import { Link } from "react-scroll";
 import { Github,Linkedin,Mail,Phone } from "lucide-react";
 const Footer = () => {
   return (
-    <div className="w-full h-[20%] flex justify-between items-center lg:px-9 px-5 bg-gray-400/15 backdrop-blur-md border-t-2 border-gray-400/30 ">
+    <div className="w-full lg:h-[20%] h-[30%] flex lg:flex-row flex-col-reverse justify-between items-center lg:p-9 p-5 bg-gray-400/15 backdrop-blur-md border-t-2 border-gray-400/30 ">
       <div className="text-white font-medium">
         <h1>&copy; Hatim Built with MERN</h1>
       </div>
