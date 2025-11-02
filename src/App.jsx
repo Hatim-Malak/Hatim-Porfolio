@@ -1,5 +1,20 @@
 import React, { useState } from "react";
 import DarkVeil from "./components/DarkVeil.jsx";
+import LogoLoop from "./components/LogoLoop.jsx";
+import {
+  SiMongodb,
+  SiExpress,
+  SiReact,
+  SiNodedotjs,
+  SiPython,
+  SiGithub,
+  SiFigma,
+  SiPostman,
+  SiSwagger,
+  SiLangchain,
+} from "react-icons/si";
+import { TbTopologyStar3 } from "react-icons/tb"; // Used for LangGraph
+import { FaBrain } from "react-icons/fa"; // Used for LangSmith
 import Navbar from "./components/Navbar.jsx";
 import { Element } from "react-scroll";
 import Tilt from "react-parallax-tilt";
@@ -39,6 +54,70 @@ const App = () => {
         }
       );
   };
+
+  const techLogos = [
+    {
+      node: <SiMongodb className="text-white" />,
+      title: "MongoDB",
+      href: "https://www.mongodb.com",
+    },
+    {
+      node: <SiExpress className="text-white" />,
+      title: "Express.js",
+      href: "https://expressjs.com",
+    },
+    {
+      node: <SiReact className="text-white" />,
+      title: "React",
+      href: "https://react.dev",
+    },
+    {
+      node: <SiNodedotjs className="text-white" />,
+      title: "Node.js",
+      href: "https://nodejs.org",
+    },
+    {
+      node: <SiPython className="text-white" />,
+      title: "Python",
+      href: "https://www.python.org",
+    },
+
+    {
+      node: <SiGithub className="text-white" />,
+      title: "GitHub",
+      href: "https://github.com",
+    },
+    {
+      node: <SiFigma className="text-white" />,
+      title: "Figma",
+      href: "https://www.figma.com",
+    },
+    {
+      node: <SiLangchain className="text-white" />,
+      title: "LangChain",
+      href: "https://www.langchain.com",
+    },
+    {
+      node: <TbTopologyStar3 className="text-white" />,
+      title: "LangGraph",
+      href: "https://www.langchain.com/langgraph",
+    },
+    {
+      node: <FaBrain className="text-white" />,
+      title: "LangSmith",
+      href: "https://smith.langchain.com",
+    },
+    {
+      node: <SiPostman className="text-white" />,
+      title: "Postman",
+      href: "https://www.postman.com",
+    },
+    {
+      node: <SiSwagger className="text-white" />,
+      title: "Swagger",
+      href: "https://swagger.io",
+    },
+  ];
 
   const projects = [
     {
@@ -138,7 +217,7 @@ const App = () => {
         </div>
         <Element
           name="Home"
-          className="h-screen w-full flex lg:flex-row  flex-col-reverse overflow-hidden "
+          className="min-h-screen w-full justify-center items-center pt-24 flex lg:flex-row  flex-col-reverse overflow-hidden "
         >
           <div className="lg:w-[50%] lg:h-full w-full h-[60%] flex flex-col justify-center items-center">
             <div className="flex flex-col items-start gap-3 lg:w-[60%] w-[90%]">
@@ -173,6 +252,20 @@ const App = () => {
                 APIs. Proficient in data structures, algorithms, and modern
                 software development practices.
               </p>
+              <div className="w-full relative z-50">
+                <LogoLoop
+                  logos={techLogos}
+                  speed={120}
+                  direction="left"
+                  logoHeight={48}
+                  gap={40}
+                  pauseOnHover
+                  scaleOnHover
+                  fadeOut
+                  fadeOutColor="#000000"
+                  ariaLabel="Technology partners"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-center lg:items-center items-end lg:w-[50%] lg:h-full w-full h-[40%] ">
@@ -208,21 +301,42 @@ const App = () => {
               className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
             >
               <h1 className="text-white text-3xl font-bold">Frontend</h1>
-              <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./html1.png" alt="html" />
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img src="./html1.png" className="size-[40px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">HTML</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./css2.webp" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img src="./css2.webp" className="size-[34px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">CSS</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./javascript.webp" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./javascript.webp"
+                    className="size-[40px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">
+                    JAVASCRIPT
+                  </h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./React-icon.svg.png" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./React-icon.svg.png"
+                    className="size-[40px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">REACT</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./tailwindcss-icon.svg" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-1 rounded-md bg-gray-800/50">
+                  <img
+                    src="./tailwindcss-icon.svg"
+                    className="size-[33px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white text-center">
+                    TAILWIND CSS
+                  </h1>
                 </div>
               </div>
             </Tilt>
@@ -236,18 +350,34 @@ const App = () => {
               className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
             >
               <h1 className="text-white text-3xl font-bold">Backend</h1>
-              <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./node.png" alt="html" />
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img src="./node.png" className="size-[40px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">NODE.JS</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./express-js.png" alt="html" />
+                <div className="size-[80px] p-3  flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./express-js.png"
+                    className="size-[40px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">
+                    EXPRESS.JS
+                  </h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./fastapi.svg" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img src="./fastapi.svg" className="size-[40px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">FASTAPI</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./Socket-io.svg" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./Socket-io.svg"
+                    className="size-[40px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">
+                    SOCKET.IO
+                  </h1>
                 </div>
               </div>
             </Tilt>
@@ -261,18 +391,30 @@ const App = () => {
               className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
             >
               <h1 className="text-white text-3xl font-bold">Languages</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
-                  <img src="./c.webp" alt="html" />
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
+                <div className="size-[80px] p-3 flex flex-col gap-1 justify-center items-center rounded-md bg-gray-800/50">
+                  <img src="./c.webp" className="size-[45px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">C</h1>
                 </div>
-                <div className="size-[70px] flex p-3 bg-gray-800 rounded-full justify-center items-center">
-                  <img src="./c++.png" alt="html" />
+                <div className="size-[80px] flex p-3 flex-col gap-1 justify-center items-center rounded-md bg-gray-800/50">
+                  <img
+                    src="./c++.png"
+                    className="w-[40px]  h-[45px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">C++</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
-                  <img src="./java.png" alt="html" className="h-[95%] w-[95%]" />
+                <div className="size-[80px] p-3 rounded-md bg-gray-800/50 flex flex-col gap-0.5 justify-center items-center">
+                  <img
+                    src="./java.png"
+                    alt="html"
+                    className="w-[35px] h-[50px]"
+                  />
+                  <h1 className="text-sm font-semibold text-white">JAVA</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full flex justify-center items-center">
-                  <img src="./python.png" alt="html"  />
+                <div className="size-[80px] p-3 rounded-md bg-gray-800/50 flex flex-col gap-2 justify-center items-center">
+                  <img src="./python.png" className="size-[35px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">PYTHON</h1>
                 </div>
               </div>
             </Tilt>
@@ -286,18 +428,30 @@ const App = () => {
               className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
             >
               <h1 className="text-white text-3xl font-bold">Tools</h1>
-              <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./github.png" alt="html" />
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img src="./github.png" className="size-[35px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">GITHUB</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./figma.webp" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center  rounded-md bg-gray-800/50">
+                  <img src="./figma.webp" className="size-[51px]" alt="html" />
+                  <h1 className="text-sm font-semibold text-white">FIGMA</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./postman.webp" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./postman.webp"
+                    className="size-[35px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">POSTMAN</h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./swagger-logo.png" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
+                  <img
+                    src="./swagger-logo.png"
+                    className="size-[35px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white">SWAGGER</h1>
                 </div>
               </div>
             </Tilt>
@@ -311,15 +465,36 @@ const App = () => {
               className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
             >
               <h1 className="text-white text-3xl font-bold">AI Technologies</h1>
-              <div className="grid grid-cols-3 gap-x-2 gap-y-4 items-center justify-center grid-rows-2">
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./langchain.webp" alt="html" />
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center  rounded-md bg-gray-800/50">
+                  <img
+                    src="./langchain.webp"
+                    className="size-[45px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white text-center">
+                    LANG CHAIN
+                  </h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./langgraph (1).png" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center items-center rounded-md bg-gray-800/50">
+                  <img
+                    src="./langgraph (1).png"
+                    className="size-[45px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white text-center">
+                    LANG GRAPH
+                  </h1>
                 </div>
-                <div className="size-[70px] p-3 bg-gray-800 rounded-full">
-                  <img src="./langsmith.png" alt="html" />
+                <div className="size-[80px] p-3 flex flex-col justify-center  items-center rounded-md bg-gray-800/50">
+                  <img
+                    src="./langsmith.png"
+                    className="size-[45px]"
+                    alt="html"
+                  />
+                  <h1 className="text-sm font-semibold text-white text-center">
+                    LANG SMITH
+                  </h1>
                 </div>
               </div>
             </Tilt>
@@ -515,7 +690,7 @@ const App = () => {
         </Element>
         <Element
           name="Contact"
-          className="h-screen w-full flex flex-col justify-center items-center pt-24"
+          className="min-h-screen w-full flex flex-col justify-between items-center pt-24"
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
@@ -564,7 +739,7 @@ const App = () => {
               )}
             </button>
           </form>
-          <Footer/>
+          <Footer />
         </Element>
       </div>
       <Toaster />

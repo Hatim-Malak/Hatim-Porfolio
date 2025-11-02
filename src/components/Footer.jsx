@@ -8,7 +8,7 @@ const Footer = () => {
         <h1>&copy; Hatim Built with MERN</h1>
       </div>
       <div className="flex justify-center items-center text-white font-bold gap-10">
-        <Link>Home</Link>
+        <Link >Home</Link>
         <Link>Skills</Link>
         <Link>Contact</Link>
       </div>
