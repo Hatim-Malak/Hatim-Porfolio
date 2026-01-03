@@ -219,8 +219,8 @@ const App = () => {
           name="Home"
           className="min-h-screen w-full justify-center items-center pt-24 flex lg:flex-row  lg2:flex-row  flex-col-reverse overflow-hidden "
         >
-          <div className="lg:w-[60%] lg2:w-[60%] lg:h-full lg2:h-full w-full h-[60%] flex flex-col justify-center items-center">
-            <div className="flex flex-col items-start gap-3 lg:w-[60%] lg2:w-[60%] w-[90%]">
+          <div className="lg:w-[50%] lg2:w-[50%] lg:h-full lg2:h-full w-full h-[60%] flex flex-col justify-center items-center">
+            <div className="flex flex-col items-start gap-3 lg:w-[60%] lg2:w-[80%] w-[90%]">
               <h1 className="text-white lg:text-4xl md:text-4xl mb-4 text-2xl font-bold">
                 Hi, I am
               </h1>
@@ -268,8 +268,8 @@ const App = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center lg:items-center lg2:items-center items-end lg:w-[40%] lg2:w-[40%] lg:h-full lg2:h-full w-full h-[40%] ">
-            <div className="lg:size-[400px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-[#6609b3]">
+          <div className="flex justify-center lg:items-center lg2:items-center items-end lg:w-[50%] lg2:w-[50%] lg:h-full lg2:h-full w-full h-[40%] ">
+            <div className="lg:size-[500px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-[#6609b3]">
               <img
                 src="./Profile_Photo.jpg"
                 alt="profilePic"
