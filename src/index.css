@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Leckerli+One&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,4 +10,16 @@ canvas {
 
 .flint{
   color: #6609b3;
+}
+
+.gr {
+  font-family: "Great Vibes", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lec {
+  font-family: "Leckerli One", cursive;
+  font-weight: 400;
+  font-style: normal;
 }

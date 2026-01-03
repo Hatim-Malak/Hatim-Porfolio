@@ -12,7 +12,7 @@ const Navbar = () => {
   }, [open])
   return (
     <>
-    <div className="fixed border backdrop-blur-md border-white border-opacity-30 lg:w-[70%] bg-gray-400/15 w-[90%] top-5 rounded-full lg:flex lg:block hidden  px-7 justify-between items-center z-10">
+    <div className="fixed border backdrop-blur-md border-white border-opacity-30 lg:w-[70%] lg2:w-[90%] bg-gray-400/15 w-[98%] top-5 rounded-full lg:flex lg2:flex lg:block lg2:block hidden  px-7 justify-between items-center z-10">
       <div>
         <ShinyText
           text="Hatim Malak"
@@ -37,7 +37,7 @@ const Navbar = () => {
         </a>
       </div>
     </div>
-    <div className="flex justify-between w-full z-[99]  px-3 fixed top-5 lg:hidden block  items-center">
+    <div className="flex justify-between w-full z-[99]  px-3 fixed top-5 lg:hidden lg2:hidden block  items-center">
       <div className=" bg-gray-400/15 px-3 py-2 rounded-full border backdrop-blur-md border-white border-opacity-30">
         <ShinyText
           text="Hatim Malak"

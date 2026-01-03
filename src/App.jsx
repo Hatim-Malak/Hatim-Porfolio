@@ -217,17 +217,17 @@ const App = () => {
         </div>
         <Element
           name="Home"
-          className="min-h-screen w-full justify-center items-center pt-24 flex lg:flex-row  flex-col-reverse overflow-hidden "
+          className="min-h-screen w-full justify-center items-center pt-24 flex lg:flex-row  lg2:flex-row  flex-col-reverse overflow-hidden "
         >
-          <div className="lg:w-[50%] lg:h-full w-full h-[60%] flex flex-col justify-center items-center">
-            <div className="flex flex-col items-start gap-3 lg:w-[60%] w-[90%]">
-              <h1 className="text-white lg:text-4xl md:text-4xl text-2xl font-bold">
+          <div className="lg:w-[60%] lg2:w-[60%] lg:h-full lg2:h-full w-full h-[60%] flex flex-col justify-center items-center">
+            <div className="flex flex-col items-start gap-3 lg:w-[60%] lg2:w-[60%] w-[90%]">
+              <h1 className="text-white lg:text-4xl md:text-4xl mb-4 text-2xl font-bold">
                 Hi, I am
               </h1>
-              <h1 className="text-white lg:text-6xl md:text-6xl text-4xl font-bold">
+              <h1 className="text-[#6609b3] lg:text-6xl lg2:text-6xl md:text-6xl text-4xl font-bold">
                 Hatim Malak
               </h1>
-              <h1 className="text-white lg:text-3xl md:text-3xl text-xl  font-bold flex gap-2">
+              <h1 className="text-white lg:text-3xl lg2:text-3xl md:text-3xl text-xl  font-bold flex gap-2">
                 I am a
                 <TextType
                   className=" text-gray-800 font-bold"
@@ -243,7 +243,7 @@ const App = () => {
                   cursorCharacter="|"
                 />
               </h1>
-              <p className="w-full text-white lg:text-xl md:text-xl text-lg font-semibold">
+              <p className="w-full text-white lg:text-xl lg2:text-xl md:text-xl text-lg font-semibold">
                 Aspiring MERN Stack Developer | B.Tech IT Student Passionate and
                 driven full-stack web developer with a strong foundation in
                 JavaScript, Python, React, Node.js, and MongoDB. Skilled in
@@ -268,8 +268,8 @@ const App = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center lg:items-center items-end lg:w-[50%] lg:h-full w-full h-[40%] ">
-            <div className="lg:size-[450px] size-[230px] rounded-full border-[5px] border-[#6609b3]">
+          <div className="flex justify-center lg:items-center lg2:items-center items-end lg:w-[40%] lg2:w-[40%] lg:h-full lg2:h-full w-full h-[40%] ">
+            <div className="lg:size-[400px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-[#6609b3]">
               <img
                 src="./Profile_Photo.jpg"
                 alt="profilePic"
@@ -290,7 +290,7 @@ const App = () => {
               various project and experience
             </p>
           </div>
-          <div className=" lg:grid lg:grid-cols-3 lg:gap-8 lg:place-items-center flex flex-col gap-5 items-center justify-start ">
+          <div className=" lg:grid lg2:grid lg:grid-cols-3 lg2:grid-cols-3 lg:gap-8 lg2:gap-8 lg:place-items-center lg2:place-items-center flex flex-col gap-5 items-center justify-start ">
             <Tilt
               glareEnable={true}
               glareMaxOpacity={0.3}
@@ -513,7 +513,7 @@ const App = () => {
             </p>
           </div>
 
-          <div className="relative flex lg:flex-row flex-col mt-5 gap-8 justify-center items-center w-full h-full transition-all">
+          <div className="relative flex lg:flex-row lg2:flex-row flex-col mt-5 gap-8 justify-center items-center w-full h-full transition-all">
             {projects.map((pro) => (
               <React.Fragment key={pro.id}>
                 {openpro !== pro.id ? (
@@ -550,8 +550,8 @@ const App = () => {
                   </div>
                 ) : (
                   <div className="fixed inset-0 z-[99] flex justify-center items-center bg-black/60 backdrop-blur-md overflow-y-auto py-10 px-3">
-                    <div className="w-[90%] lg:w-[60%] bg-gray-800 text-white rounded-2xl flex  flex-col lg:flex-row overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-                      <div className="lg:w-[30%] w-full h-[250px] lg:h-auto">
+                    <div className="w-[90%] lg:w-[60%] lg2:w-[60%] bg-gray-800 text-white rounded-2xl flex  flex-col lg:flex-row lg2:flex-row overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                      <div className="lg:w-[30%] lg2:w-[30%] w-full h-[250px] lg:h-auto lg2:h-auto">
                         <img
                           src={pro.img}
                           alt="project"
@@ -559,7 +559,7 @@ const App = () => {
                         />
                       </div>
 
-                      <div className="lg:w-[70%] w-full p-6 flex flex-col justify-around gap-5">
+                      <div className="lg:w-[70%] lg2:w-[70%] w-full p-6 flex flex-col justify-around gap-5">
                         <h1 className="text-3xl font-bold flex justify-between items-center">
                           {pro.name}
                           <X
@@ -585,7 +585,7 @@ const App = () => {
 
                         <div className="flex justify-around gap-3 mt-5">
                           <a
-                            className="bg-gray-600 text-white lg:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
+                            className="bg-gray-600 text-white lg:w-[50%] lg2:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
                             href={pro.code}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -594,7 +594,7 @@ const App = () => {
                             <ExternalLink className="text-white" />
                           </a>
                           <a
-                            className="bg-[#6609b3] text-white lg:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
+                            className="bg-[#6609b3] text-white lg:w-[50%] lg2:w-[50%] text-lg flex gap-2 justify-center items-center px-5 py-3 rounded-2xl font-bold"
                             href={pro.live}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -614,7 +614,7 @@ const App = () => {
 
         <Element
           name="Education"
-          className="py-24 pb-24 px-[12vw] md:px-[7vw] lg:px-[16vw] font-sans bg-skills-gradient clip-path-custom-3"
+          className="py-24 pb-24 px-[12vw] md:px-[7vw] lg:px-[16vw] lg2:px-[16vw] font-sans bg-skills-gradient clip-path-custom-3"
         >
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white">EDUCATION</h2>
@@ -625,21 +625,23 @@ const App = () => {
             </p>
           </div>
 
-          {/* Education Timeline */}
-          <div className="relative">
-            {/* Vertical line */}
-            <div className="absolute sm:left-1/2 left-0 transform -translate-x-1/2 sm:-translate-x-0 w-1 bg-white h-full"></div>
+          <div className="relative w-full max-w-7xl mx-auto px-4 py-10 overflow-hidden">
+            {/* VERTICAL LINE */}
+            {/* Mobile: Anchored to left-6 (24px). Desktop: Anchored to center (50%) */}
+            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-white transform md:-translate-x-1/2"></div>
 
             {/* Education Entries */}
             {education.map((edu, index) => (
               <div
                 key={edu.id}
-                className={`flex flex-col sm:flex-row items-center mb-16 ${
-                  index % 2 === 0 ? "sm:justify-start" : "sm:justify-end"
+                className={`relative flex items-center mb-12 w-full ${
+                  /* Desktop: Alternate Left/Right alignment */
+                  index % 2 === 0 ? "md:justify-start" : "md:justify-end"
                 }`}
               >
-                {/* Timeline Circle */}
-                <div className="absolute sm:left-1/2 left-0 transform -translate-x-1/2 bg-gray-400 border-4 border-[#6609b3] w-12 h-12 sm:w-16 sm:h-16 rounded-full flex justify-center items-center z-10">
+                {/* TIMELINE DOT */}
+                {/* Mobile: Fixed at left-6. Desktop: Fixed at center */}
+                <div className="absolute left-6 md:left-1/2 transform -translate-x-1/2 bg-gray-400 border-4 border-[#6609b3] w-12 h-12 rounded-full flex justify-center items-center z-10 shrink-0">
                   <img
                     src={edu.img}
                     alt={edu.school}
@@ -647,16 +649,32 @@ const App = () => {
                   />
                 </div>
 
-                {/* Content Section */}
+                {/* CARD CONTENT */}
+                {/* Mobile logic: 
+         - ml-16: Pushes card right of the line (24px line + space)
+         - w-full: Takes remaining width
+         
+         Desktop logic:
+         - md:ml-0: Resets mobile margin
+         - md:w-[45%]: Takes up slightly less than half width
+         - md:pr/pl-12: Adds spacing between card and center line
+      */}
                 <div
-                  className={`w-full sm:max-w-md p-4 sm:p-8 rounded-2xl  border border-white bg-gray-400/15 shadow-[0_0_20px_1px_rgba(130,69,236,0.3)] ${
-                    index % 2 === 0 ? "sm:ml-0" : "sm:mr-0"
-                  } sm:ml-44 sm:mr-44 ml-8 transform transition-transform duration-300 hover:scale-105`}
+                  className={`relative p-6 rounded-2xl border border-white bg-gray-400/15 shadow-[0_0_20px_1px_rgba(130,69,236,0.3)] backdrop-blur-sm 
+        
+        /* Mobile: Push to right of line */
+        ml-16 w-auto
+
+        /* Desktop: Width and Spacing */
+        md:w-[45%] md:ml-0
+        ${index % 2 === 0 ? "md:mr-12" : "md:ml-12"}
+        
+        transform transition-transform duration-300 hover:scale-105`}
                 >
-                  {/* Flex container for image and text */}
-                  <div className="flex items-center space-x-6">
-                    {/* School Logo/Image */}
-                    <div className="w-24 h-16 bg-white rounded-md overflow-hidden">
+                  {/* Inner Card Content */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    {/* Logo */}
+                    <div className="w-16 h-16 bg-white rounded-md overflow-hidden shrink-0">
                       <img
                         src={edu.img}
                         alt={edu.school}
@@ -664,25 +682,22 @@ const App = () => {
                       />
                     </div>
 
-                    {/* Degree, School Name, and Date */}
-                    <div className="flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-xl sm:text-xl font-semibold text-white">
-                          {edu.degree}
-                        </h3>
-                        <h4 className="text-md sm:text-sm text-white">
-                          {edu.school}
-                        </h4>
-                      </div>
-                      {/* Date at the bottom */}
-                      <p className="text-sm text-white mt-2">{edu.date}</p>
+                    {/* Text Info */}
+                    <div className="flex flex-col">
+                      <h3 className="text-lg font-semibold text-white">
+                        {edu.degree}
+                      </h3>
+                      <h4 className="text-sm text-gray-200">{edu.school}</h4>
+                      <p className="text-xs text-gray-300 mt-1">{edu.date}</p>
                     </div>
                   </div>
 
-                  <p className="mt-4 text-white font-bold">
-                    Grade: {edu.grade}
-                  </p>
-                  <p className="mt-4 text-white">{edu.desc}</p>
+                  <div className="mt-4">
+                    <p className="text-white font-bold text-sm">
+                      Grade: {edu.grade}
+                    </p>
+                    <p className="mt-2 text-gray-200 text-sm">{edu.desc}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -710,24 +725,24 @@ const App = () => {
               name="from_name"
               placeholder="Your Name"
               required
-              className="p-3 lg:w-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
+              className="p-3 lg:w-[30%] lg2:w-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
             />
             <input
               type="email"
               name="from_email"
               placeholder="Your Email"
               required
-              className="p-3 lg:w-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
+              className="p-3 lg:w-[30%] lg2:w-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
             />
             <textarea
               name="message"
               placeholder="Your Message"
               required
-              className="p-3 lg:w-[30%] h-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
+              className="p-3 lg:w-[30%] lg2:w-[30%] h-[30%] w-[90%] border border-gray-400/30 bg-gray-400/15 text-white text-lg font-semibold rounded"
             />
             <button
               type="submit"
-              className="bg-[#6609b3] lg:w-[30%] w-[90%] text-lg font-semibold text-white p-3 rounded "
+              className="bg-[#6609b3] lg:w-[30%] lg2:w-[30%] w-[90%] text-lg font-semibold text-white p-3 rounded "
             >
               {load ? (
                 <div className="flex justify-center items-center gap-2">
