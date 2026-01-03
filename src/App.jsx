@@ -274,9 +274,9 @@ const App = () => {
   hover:shadow-[0_0_30px_rgba(168,85,247,0.8)]
   transition-all duration-300">
               <img
-                src="./Profile_Photo.jpg"
+                src="./Profile_Photo1.png"
                 alt="profilePic"
-                className="object-cover w-full h-full rounded-full"
+                className="object-cover object-top w-full h-full rounded-full"
               />
             </div>
           </div>
