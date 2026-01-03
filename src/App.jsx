@@ -224,7 +224,7 @@ const App = () => {
               <h1 className="text-white lg:text-4xl md:text-4xl mb-4 text-2xl font-bold">
                 Hi, I am
               </h1>
-              <h1 className="text-[#6609b3] lg:text-6xl lg2:text-6xl md:text-6xl text-4xl font-bold">
+              <h1 className="text-white lg:text-6xl lg2:text-6xl md:text-6xl text-4xl font-bold">
                 Hatim Malak
               </h1>
               <h1 className="text-white lg:text-3xl lg2:text-3xl md:text-3xl text-xl  font-bold flex gap-2">
@@ -614,7 +614,7 @@ const App = () => {
 
         <Element
           name="Education"
-          className="py-24 pb-24 px-[12vw] md:px-[7vw] lg:px-[16vw] lg2:px-[16vw] font-sans bg-skills-gradient clip-path-custom-3"
+          className="py-24 pb-24 px-[12vw] lg2:px-[7vw] lg:px-[16vw] lg2:px-[16vw] font-sans bg-skills-gradient clip-path-custom-3"
         >
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white">EDUCATION</h2>
@@ -625,10 +625,10 @@ const App = () => {
             </p>
           </div>
 
-          <div className="relative w-full max-w-7xl mx-auto px-4 py-10 overflow-hidden">
+          <div className="relative w-full max-w-7xl mx-auto px-2 lg:px-4 lg2:px-4 py-10 overflow-hidden">
             {/* VERTICAL LINE */}
             {/* Mobile: Anchored to left-6 (24px). Desktop: Anchored to center (50%) */}
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-1 bg-white transform md:-translate-x-1/2"></div>
+            <div className="absolute left-6 lg2:left-1/2 top-1/2 -translate-y-1/2 w-1 h-[83%] bg-white transform lg2:-translate-x-1/2"></div>
 
             {/* Education Entries */}
             {education.map((edu, index) => (
@@ -636,12 +636,12 @@ const App = () => {
                 key={edu.id}
                 className={`relative flex items-center mb-12 w-full ${
                   /* Desktop: Alternate Left/Right alignment */
-                  index % 2 === 0 ? "md:justify-start" : "md:justify-end"
+                  index % 2 === 0 ? "lg2:justify-start" : "lg2:justify-end"
                 }`}
               >
                 {/* TIMELINE DOT */}
                 {/* Mobile: Fixed at left-6. Desktop: Fixed at center */}
-                <div className="absolute left-6 md:left-1/2 transform -translate-x-1/2 bg-gray-400 border-4 border-[#6609b3] w-12 h-12 rounded-full flex justify-center items-center z-10 shrink-0">
+                <div className="absolute left-6 lg2:left-1/2 transform -translate-x-1/2 bg-gray-400 border-4 border-[#6609b3] w-12 h-12 rounded-full flex justify-center items-center z-10 shrink-0">
                   <img
                     src={edu.img}
                     alt={edu.school}
@@ -666,8 +666,8 @@ const App = () => {
         ml-16 w-auto
 
         /* Desktop: Width and Spacing */
-        md:w-[45%] md:ml-0
-        ${index % 2 === 0 ? "md:mr-12" : "md:ml-12"}
+        lg2:w-[45%] lg2:ml-0
+        ${index % 2 === 0 ? "lg2:mr-12" : "lg2:ml-12"}
         
         transform transition-transform duration-300 hover:scale-105`}
                 >
