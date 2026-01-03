@@ -252,7 +252,7 @@ const App = () => {
                 APIs. Proficient in data structures, algorithms, and modern
                 software development practices.
               </p>
-              <div className="w-full relative z-50">
+              <div className="w-full relative z-9">
                 <LogoLoop
                   logos={techLogos}
                   speed={120}
