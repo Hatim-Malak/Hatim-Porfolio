@@ -269,7 +269,10 @@ const App = () => {
             </div>
           </div>
           <div className="flex justify-center lg:items-center lg2:items-center items-end lg:w-[50%] lg2:w-[50%] lg:h-full lg2:h-full w-full h-[40%] ">
-            <div className="lg:size-[500px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-[#6609b3]">
+            <div className="lg:size-[500px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-purple-500 
+  shadow-[0_0_20px_rgba(168,85,247,0.5)]
+  hover:shadow-[0_0_30px_rgba(168,85,247,0.8)]
+  transition-all duration-300">
               <img
                 src="./Profile_Photo.jpg"
                 alt="profilePic"
@@ -520,7 +523,10 @@ const App = () => {
                   // Normal Project Card
                   <div
                     onClick={() => setopenpro(pro.id)}
-                    className="w-[300px] h-[500px] transition-all flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-white/30 rounded-lg cursor-pointer hover:scale-105 duration-300"
+                    className="w-[300px] h-[500px] transition-all flex flex-col justify-start gap-3 items-start bg-gray-400/15 border-2 border-purple-500 
+  shadow-[0_0_20px_rgba(168,85,247,0.5)]
+  hover:shadow-[0_0_30px_rgba(168,85,247,0.8)]
+   rounded-lg cursor-pointer hover:scale-105 duration-300"
                   >
                     <div className="w-full h-[35%]">
                       <img
