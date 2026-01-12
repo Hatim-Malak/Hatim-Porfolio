@@ -456,8 +456,8 @@ const App = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="fixed inset-0 z-[99] flex justify-center items-center bg-black/60 backdrop-blur-md overflow-y-auto py-10 px-3">
-                    <div className="w-[90%] lg:w-[60%] lg2:w-[60%] bg-gray-800 text-white rounded-2xl flex  flex-col lg:flex-row lg2:flex-row overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                  <div className="fixed inset-0 h-screen z-[99] flex justify-center items-center bg-black/60 backdrop-blur-md overflow-y-auto py-10 px-3">
+                    <div className="w-[90%] max-h-[95%] lg:w-[60%] lg2:w-[60%] bg-gray-800 text-white rounded-2xl flex  flex-col lg:flex-row lg2:flex-row overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)]">
                       <div className="lg:w-[30%] lg2:w-[30%] w-full h-[250px] lg:h-auto lg2:h-auto">
                         <img
                           src={pro.img}
@@ -466,7 +466,7 @@ const App = () => {
                         />
                       </div>
 
-                      <div className="lg:w-[70%] lg2:w-[70%] w-full p-6 flex flex-col justify-around gap-5">
+                      <div className="lg:w-[70%] lg2:w-[70%] w-full p-6 flex flex-col justify-around gap-2 lg:gap-5 lg2:gap-5">
                         <h1 className="text-3xl font-bold flex justify-between items-center">
                           {pro.name}
                           <X
@@ -475,7 +475,7 @@ const App = () => {
                           />
                         </h1>
 
-                        <p className="text-lg overflow-y-auto max-h-[300px] pr-2">
+                        <p className="text-lg overflow-y-auto max-h-[200px] lg:max-h-[300px] lg2:max-h-[300px] pr-2">
                           {pro.description}
                         </p>
 
@@ -616,7 +616,7 @@ const App = () => {
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
-           <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             <p className="text-white text-xl font-semibold text-center">
               I'd love to hear from you - reach out for any opportunities !
             </p>
