@@ -54,7 +54,53 @@ const App = () => {
         }
       );
   };
-
+  const skills = [
+    {
+      title: "Frontend",
+      items: [
+        { name: "HTML", icon: "./html1.png", size: "40px" },
+        { name: "CSS", icon: "./css2.webp", size: "34px" },
+        { name: "JAVASCRIPT", icon: "./javascript.webp", size: "40px" },
+        { name: "REACT", icon: "./React-icon.svg.png", size: "40px" },
+        { name: "TAILWIND CSS", icon: "./tailwindcss-icon.svg", size: "33px" },
+      ],
+    },
+    {
+      title: "Backend",
+      items: [
+        { name: "NODE.JS", icon: "./node.png", size: "40px" },
+        { name: "EXPRESS.JS", icon: "./express-js.png", size: "40px" },
+        { name: "FASTAPI", icon: "./fastapi.svg", size: "40px" },
+        { name: "SOCKET.IO", icon: "./Socket-io.svg", size: "40px" },
+      ],
+    },
+    {
+      title: "Languages",
+      items: [
+        { name: "C", icon: "./c.webp", size: "45px" },
+        { name: "C++", icon: "./c++.png", size: "40px", height: "45px" },
+        { name: "JAVA", icon: "./java.png", size: "35px", height: "50px" },
+        { name: "PYTHON", icon: "./python.png", size: "35px" },
+      ],
+    },
+    {
+      title: "Tools",
+      items: [
+        { name: "GITHUB", icon: "./github.png", size: "35px" },
+        { name: "FIGMA", icon: "./figma.webp", size: "51px" },
+        { name: "POSTMAN", icon: "./postman.webp", size: "35px" },
+        { name: "SWAGGER", icon: "./swagger-logo.png", size: "35px" },
+      ],
+    },
+    {
+      title: "AI Technologies",
+      items: [
+        { name: "LANG CHAIN", icon: "./langchain.webp", size: "45px" },
+        { name: "LANG GRAPH", icon: "./langgraph (1).png", size: "45px" },
+        { name: "LANG SMITH", icon: "./langsmith.png", size: "45px" },
+      ],
+    },
+  ];
   const techLogos = [
     {
       node: <SiMongodb className="text-white" />,
@@ -269,10 +315,12 @@ const App = () => {
             </div>
           </div>
           <div className="flex justify-center lg:items-center lg2:items-center items-end lg:w-[50%] lg2:w-[50%] lg:h-full lg2:h-full w-full h-[40%] ">
-            <div className="lg:size-[500px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-purple-500 
+            <div
+              className="lg:size-[500px] lg2:size-[400px] md:size-[300px] size-[230px] rounded-full border-[5px] border-purple-500 
   shadow-[0_0_20px_rgba(168,85,247,0.5)]
   hover:shadow-[0_0_30px_rgba(168,85,247,0.8)]
-  transition-all duration-300">
+  transition-all duration-300"
+            >
               <img
                 src="./Profile_Photo1.png"
                 alt="profilePic"
@@ -287,220 +335,73 @@ const App = () => {
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">SKILLS</h1>
-            <div className="w-[120px] border-2  border-[#6609b3]"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             <p className="text-white text-xl text-center font-semibold my-3">
               A collection of my technical skills and expertise honed through
               various project and experience
             </p>
           </div>
-          <div className=" lg:grid lg2:grid lg:grid-cols-3 lg2:grid-cols-3 lg:gap-8 lg2:gap-8 lg:place-items-center lg2:place-items-center flex flex-col gap-5 items-center justify-start ">
-            <Tilt
-              glareEnable={true}
-              glareMaxOpacity={0.3}
-              scale={1.05}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
-              transitionSpeed={250}
-              className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
-            >
-              <h1 className="text-white text-3xl font-bold">Frontend</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img src="./html1.png" className="size-[40px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">HTML</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img src="./css2.webp" className="size-[34px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">CSS</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./javascript.webp"
-                    className="size-[40px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">
-                    JAVASCRIPT
-                  </h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./React-icon.svg.png"
-                    className="size-[40px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">REACT</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-1 rounded-md bg-gray-800/50">
-                  <img
-                    src="./tailwindcss-icon.svg"
-                    className="size-[33px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white text-center">
-                    TAILWIND CSS
-                  </h1>
-                </div>
+          <div className="min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
+                {skills.map((category, categoryIndex) => (
+                  <Tilt
+                    key={categoryIndex}
+                    options={{
+                      max: 15,
+                      scale: 1.05,
+                      speed: 250,
+                      glare: true,
+                      "max-glare": 0.3,
+                    }}
+                    className="w-full max-w-[320px]"
+                  >
+                    <div className="bg-gray-400/15  min-h-[300px] border border-white/10 rounded-2xl p-6 shadow-2xl hover:shadow-blue-500/20 transition-all duration-300">
+                      {/* Card Header */}
+                      <div className="text-center mb-6">
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                          {category.title}
+                        </h2>
+                        <div className="h-0.5 w-16 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
+                      </div>
+
+                      {/* Skills Icons Grid */}
+                      <div className="grid grid-cols-3 gap-4">
+                        {category.items.map((item, itemIndex) => (
+                          <div
+                            key={itemIndex}
+                            className="group relative aspect-square flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-gray-700/40 to-gray-800/40 p-3 hover:from-blue-500/20 hover:to-purple-500/20 transition-all duration-300 hover:scale-105 border border-white/5 hover:border-white/20"
+                          >
+                            {/* Icon */}
+                            <div className="flex items-center justify-center flex-1">
+                              <img
+                                src={item.icon}
+                                alt={item.name}
+                                className="object-contain transition-transform duration-300 group-hover:scale-110"
+                                style={{
+                                  width: item.size,
+                                  height: item.height || item.size,
+                                }}
+                              />
+                            </div>
+
+                            {/* Label */}
+                            <div className="text-center w-full">
+                              <p className="text-[10px] font-semibold text-white/90 leading-tight line-clamp-2">
+                                {item.name}
+                              </p>
+                            </div>
+
+                            {/* Hover Glow Effect */}
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all duration-300 pointer-events-none"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Tilt>
+                ))}
               </div>
-            </Tilt>
-            <Tilt
-              glareEnable={true}
-              glareMaxOpacity={0.3}
-              scale={1.05}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
-              transitionSpeed={250}
-              className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
-            >
-              <h1 className="text-white text-3xl font-bold">Backend</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img src="./node.png" className="size-[40px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">NODE.JS</h1>
-                </div>
-                <div className="size-[80px] p-3  flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./express-js.png"
-                    className="size-[40px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">
-                    EXPRESS.JS
-                  </h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img src="./fastapi.svg" className="size-[40px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">FASTAPI</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./Socket-io.svg"
-                    className="size-[40px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">
-                    SOCKET.IO
-                  </h1>
-                </div>
-              </div>
-            </Tilt>
-            <Tilt
-              glareEnable={true}
-              glareMaxOpacity={0.3}
-              scale={1.05}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
-              transitionSpeed={250}
-              className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
-            >
-              <h1 className="text-white text-3xl font-bold">Languages</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
-                <div className="size-[80px] p-3 flex flex-col gap-1 justify-center items-center rounded-md bg-gray-800/50">
-                  <img src="./c.webp" className="size-[45px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">C</h1>
-                </div>
-                <div className="size-[80px] flex p-3 flex-col gap-1 justify-center items-center rounded-md bg-gray-800/50">
-                  <img
-                    src="./c++.png"
-                    className="w-[40px]  h-[45px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">C++</h1>
-                </div>
-                <div className="size-[80px] p-3 rounded-md bg-gray-800/50 flex flex-col gap-0.5 justify-center items-center">
-                  <img
-                    src="./java.png"
-                    alt="html"
-                    className="w-[35px] h-[50px]"
-                  />
-                  <h1 className="text-sm font-semibold text-white">JAVA</h1>
-                </div>
-                <div className="size-[80px] p-3 rounded-md bg-gray-800/50 flex flex-col gap-2 justify-center items-center">
-                  <img src="./python.png" className="size-[35px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">PYTHON</h1>
-                </div>
-              </div>
-            </Tilt>
-            <Tilt
-              glareEnable={true}
-              glareMaxOpacity={0.3}
-              scale={1.05}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
-              transitionSpeed={250}
-              className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
-            >
-              <h1 className="text-white text-3xl font-bold">Tools</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img src="./github.png" className="size-[35px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">GITHUB</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center  rounded-md bg-gray-800/50">
-                  <img src="./figma.webp" className="size-[51px]" alt="html" />
-                  <h1 className="text-sm font-semibold text-white">FIGMA</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./postman.webp"
-                    className="size-[35px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">POSTMAN</h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center gap-2 rounded-md bg-gray-800/50">
-                  <img
-                    src="./swagger-logo.png"
-                    className="size-[35px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white">SWAGGER</h1>
-                </div>
-              </div>
-            </Tilt>
-            <Tilt
-              glareEnable={true}
-              glareMaxOpacity={0.3}
-              scale={1.05}
-              tiltMaxAngleX={15}
-              tiltMaxAngleY={15}
-              transitionSpeed={250}
-              className="bg-gray-400/15 size-[300px] rounded-lg flex flex-col justify-center gap-5 items-center border border-white/30"
-            >
-              <h1 className="text-white text-3xl font-bold">AI Technologies</h1>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-6 items-center justify-center grid-rows-2">
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center  rounded-md bg-gray-800/50">
-                  <img
-                    src="./langchain.webp"
-                    className="size-[45px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white text-center">
-                    LANG CHAIN
-                  </h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center items-center rounded-md bg-gray-800/50">
-                  <img
-                    src="./langgraph (1).png"
-                    className="size-[45px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white text-center">
-                    LANG GRAPH
-                  </h1>
-                </div>
-                <div className="size-[80px] p-3 flex flex-col justify-center  items-center rounded-md bg-gray-800/50">
-                  <img
-                    src="./langsmith.png"
-                    className="size-[45px]"
-                    alt="html"
-                  />
-                  <h1 className="text-sm font-semibold text-white text-center">
-                    LANG SMITH
-                  </h1>
-                </div>
-              </div>
-            </Tilt>
+            </div>
           </div>
         </Element>
         <Element
@@ -509,7 +410,7 @@ const App = () => {
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">PROJECTS</h1>
-            <div className="w-[150px] my-2 border-2 border-[#6609b3] "></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             <p className="text-white text-xl font-semibold text-center my-3">
               A showcase of the projects I have worked on, highlighting my
               skills and technologies.
@@ -624,7 +525,7 @@ const App = () => {
         >
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white">EDUCATION</h2>
-            <div className="w-32 h-1 bg-[#6609b3] mx-auto mt-4"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             <p className="text-white mt-4 text-lg font-semibold">
               My education has been a journey of learning and development. Here
               are the details of my academic background
@@ -715,7 +616,7 @@ const App = () => {
         >
           <div className="flex flex-col items-center gap-2 ">
             <h1 className="text-white text-4xl font-bold">CONTACT US</h1>
-            <div className="w-[180px] my-2 border-2 border-[#6609b3] "></div>
+           <div className="h-1 w-32 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
             <p className="text-white text-xl font-semibold text-center">
               I'd love to hear from you - reach out for any opportunities !
             </p>
