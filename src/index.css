@@ -4,6 +4,193 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg: #0a0a0f;
+    --panel: 15 23 42; /* slate-900 */
+    --stroke: 51 65 85; /* slate-700 */
+    --text: 226 232 240; /* slate-200 */
+    --muted: 148 163 184; /* slate-400 */
+    --accentA: 99 102 241; /* indigo-500 */
+    --accentB: 30 58 138; /* blue-900 */
+    --danger: 248 113 113; /* red-400 */
+    --radius-xl: 14px;
+  }
+
+  html {
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.25);
+    color: rgba(226, 232, 240, 1);
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(129, 140, 248, 0.65);
+    outline-offset: 3px;
+  }
+
+  /* Subtle, modern scrollbar (keeps background intact). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.45) rgba(2, 6, 23, 0.2);
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.2);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(99, 102, 241, 0.65),
+      rgba(168, 85, 247, 0.55)
+    );
+    border: 2px solid rgba(2, 6, 23, 0.35);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(129, 140, 248, 0.75),
+      rgba(192, 132, 252, 0.7)
+    );
+  }
+}
+
+@layer components {
+  /* Signature “neo-terminal” panel: crisp border + soft aura. */
+  .ui-panel {
+    @apply relative rounded-xl border backdrop-blur-sm;
+    border-color: rgba(var(--stroke), 0.5);
+    background: rgba(var(--panel), 0.65);
+    box-shadow:
+      0 0 0 1px rgba(15, 23, 42, 0.3) inset,
+      0 18px 50px rgba(2, 6, 23, 0.55),
+      0 0 35px rgba(var(--accentA), 0.08);
+  }
+
+  /* Gradient “edge glow” without changing any backgrounds. */
+  .ui-glow {
+    position: relative;
+  }
+  .ui-glow::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--accentA), 0.45),
+      rgba(var(--accentB), 0.28),
+      rgba(var(--accentA), 0.12)
+    );
+    opacity: 0;
+    filter: blur(0px);
+    transition: opacity 250ms ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .ui-glow:hover::before,
+  .ui-glow:focus-within::before {
+    opacity: 1;
+  }
+
+  .ui-navlink {
+    @apply px-4 py-2 rounded-lg cursor-pointer border border-transparent transition-all duration-300 font-mono text-sm;
+    color: rgba(var(--muted), 1);
+  }
+  .ui-navlink:hover {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(var(--accentA), 0.25);
+    box-shadow: 0 0 0 1px rgba(var(--accentA), 0.08) inset;
+  }
+
+  .ui-iconbtn {
+    @apply p-2.5 rounded-lg cursor-pointer border border-transparent transition-all;
+    color: rgba(var(--muted), 1);
+  }
+  .ui-iconbtn:hover {
+    background: rgba(var(--accentA), 0.16);
+    color: rgba(129, 140, 248, 1);
+    border-color: rgba(var(--accentA), 0.25);
+  }
+
+  .ui-btn {
+    @apply inline-flex items-center justify-center gap-2 font-mono text-sm rounded-lg border transition-all duration-300 select-none;
+  }
+  .ui-btn:active {
+    transform: translateY(1px);
+  }
+
+  .ui-btn-primary {
+    @apply ui-btn px-4 py-2;
+    background: linear-gradient(
+      135deg,
+      rgba(79, 70, 229, 0.95),
+      rgba(147, 51, 234, 0.9)
+    );
+    border-color: rgba(var(--accentA), 0.25);
+    color: rgba(255, 255, 255, 1);
+    box-shadow:
+      0 10px 22px rgba(var(--accentA), 0.18),
+      0 0 0 1px rgba(2, 6, 23, 0.25) inset;
+  }
+  .ui-btn-primary:hover {
+    box-shadow:
+      0 14px 30px rgba(var(--accentA), 0.25),
+      0 0 0 1px rgba(2, 6, 23, 0.25) inset;
+    filter: saturate(1.08);
+  }
+
+  .ui-btn-ghost {
+    @apply ui-btn px-4 py-2;
+    background: rgba(15, 23, 42, 0.35);
+    border-color: rgba(var(--stroke), 0.55);
+    color: rgba(255, 255, 255, 0.92);
+  }
+  .ui-btn-ghost:hover {
+    background: rgba(30, 41, 59, 0.45);
+    border-color: rgba(var(--accentA), 0.35);
+    box-shadow: 0 0 0 1px rgba(var(--accentA), 0.08) inset;
+  }
+
+  /* Small “chip” used across project cards, etc. */
+  .ui-chip {
+    @apply text-[10px] font-mono px-2 py-1 rounded border;
+    background: rgba(30, 41, 59, 0.4);
+    border-color: rgba(var(--stroke), 0.5);
+    color: rgba(165, 180, 252, 0.95);
+  }
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 12px;
+  height: 24px;
+  background-color: #22c55e; /* green-500 */
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
 canvas {
   pointer-events: none;
 }
