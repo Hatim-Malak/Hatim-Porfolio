@@ -18,6 +18,18 @@
 
 ---
 
+## Phase 02: Scroll Animations & Transitions
+
+**Goal:** Enhance portfolio UI/UX with smooth scroll transitions, section reveal animations, and a progress indicator while maintaining the developer-focused aesthetic.
+
+**Requirements:** [SA-01, SA-02, SA-03]
+
+**Plans:**
+- [ ] 02-01-PLAN.md — Section reveal animations with GSAP ScrollTrigger
+- [ ] 02-02-PLAN.md — Progress indicator and section tracking
+
+---
+
 ## Requirements
 
 | ID | Description | Phase |
@@ -27,4 +39,7 @@
 | PE-03 | Polish projects grid with terminal-style borders | 01 |
 | PE-04 | Refine education timeline with unique developer aesthetic | 01 |
 | PE-05 | Contact form with code editor styling | 01 |
+| SA-01 | Section reveal animations on scroll | 02 |
+| SA-02 | Navigation progress indicator | 02 |
+| SA-03 | Smooth scroll behavior enhancements | 02 |
 
