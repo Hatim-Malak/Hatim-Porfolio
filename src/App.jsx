@@ -449,6 +449,7 @@ const App = () => {
           disableRotation={false}
         />
       </div>
+      <Navbar />
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
@@ -462,39 +463,6 @@ const App = () => {
               className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 transition-[width] duration-150 scroll-progress"
               style={{ width: `${scrollProgress}%` }}
             />
-          </div>
-
-          {/* Section Dot Indicators */}
-          <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3 items-center">
-            {["Home", "Skills", "Projects", "GitHub", "Education", "Contact"].map((section) => (
-              <button
-                key={section}
-                className={`group relative flex items-center transition-all duration-300 ${activeSection === section ? "scale-100" : "scale-90"
-                  }`}
-                onClick={() => {
-                  document.getElementById(`section-${section}`)?.scrollIntoView({ behavior: "smooth" });
-                }}
-                title={section}
-                aria-label={`Navigate to ${section}`}
-              >
-                <span
-                  className={`absolute right-6 px-2 py-1 rounded bg-slate-800/90 border border-slate-700/50 text-[10px] font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none ${activeSection === section ? "text-indigo-300" : "text-slate-400"
-                    }`}
-                >
-                  {section.toLowerCase()}
-                </span>
-                <span
-                  className={`block rounded-full transition-all duration-300 ${activeSection === section
-                    ? "w-3 h-3 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
-                    : "w-2 h-2 bg-slate-600 hover:bg-slate-400"
-                    }`}
-                />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-center">
-            <Navbar />
           </div>
           <Element
             name="Home"

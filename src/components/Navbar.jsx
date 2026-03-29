@@ -20,7 +20,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="fixed lg:w-[72%] lg2:w-[86%] w-[96%] top-5 lg:flex lg2:flex hidden px-4 py-3 justify-between items-center z-10 ui-panel ui-glow bg-gradient-to-r from-indigo-500/10 via-slate-900/40 to-blue-900/10 border-indigo-500/20">
+      <div className="fixed top-5 left-1/2 transform -translate-x-1/2 lg:w-[72%] lg2:w-[86%] w-[96%] lg:flex lg2:flex hidden px-4 py-3 justify-between items-center z-[999] backdrop-blur-xl ui-panel ui-glow bg-gradient-to-r from-indigo-500/20 via-slate-900/40 to-blue-900/20 border-indigo-500/20">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-indigo-500/25 to-blue-900/20 blur-xl opacity-60"></div>
@@ -99,7 +99,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="flex justify-between w-full z-[99] px-4 fixed top-5 lg:hidden items-center">
+      <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-[96%] max-w-xl lg:hidden z-[999] flex justify-between items-center px-4 backdrop-blur-xl ui-panel ui-glow bg-gradient-to-r from-indigo-500/20 via-slate-900/40 to-blue-900/20 border-indigo-500/20">
         <div className="px-3 py-2 flex items-center gap-3 ui-panel ui-glow bg-gradient-to-r from-indigo-500/10 via-slate-900/40 to-blue-900/10 border-indigo-500/20">
           <div className="w-9 h-9 rounded-xl bg-slate-900/50 border border-slate-700/50 flex items-center justify-center ui-glow">
             <ShinyText
