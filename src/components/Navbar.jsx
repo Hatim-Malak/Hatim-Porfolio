@@ -45,8 +45,8 @@ const Navbar = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                smooth={true}
-                duration={500}
+                smooth="easeInOutQuart"
+                duration={1200}
                 spy={true}
                 offset={-90}
                 onSetActive={() => setActive(link.to)}
@@ -129,8 +129,8 @@ const Navbar = () => {
                 key={link.to}
                 to={link.to}
                 className="px-4 py-3 text-slate-300 hover:text-white hover:bg-slate-800/45 rounded-xl cursor-pointer transition-all border border-slate-700/50 hover:border-indigo-500/25 ui-glow"
-                smooth={true}
-                duration={500}
+                smooth="easeInOutQuart"
+                duration={1200}
                 onClick={handleNavClick}
               >
                 {link.label}

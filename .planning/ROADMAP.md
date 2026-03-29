@@ -25,8 +25,8 @@
 **Requirements:** [SA-01, SA-02, SA-03]
 
 **Plans:**
-- [ ] 02-01-PLAN.md — Section reveal animations with GSAP ScrollTrigger
-- [ ] 02-02-PLAN.md — Progress indicator and section tracking
+- [x] 02-01-PLAN.md — Section reveal animations with GSAP ScrollTrigger
+- [x] 02-02-PLAN.md — Progress indicator and section tracking
 
 ---
 

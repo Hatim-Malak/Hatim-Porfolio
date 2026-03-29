@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DarkVeil from "./components/DarkVeil.jsx";
 import LogoLoop from "./components/LogoLoop.jsx";
 import {
@@ -21,15 +21,129 @@ import Tilt from "react-parallax-tilt";
 import TextType from "./components/TextType.jsx";
 import Particles from "./components/Particeles.jsx";
 import { useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
 import { Loader, ExternalLink, X, Github, Linkedin, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-scroll";
 import Footer from "./components/Footer.jsx";
+import Lenis from 'lenis';
+import { motion, AnimatePresence } from 'framer-motion';
 const App = () => {
   const form = useRef();
   const [load, setload] = useState(false);
   const [openpro, setopenpro] = useState(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState("Home");
+
+  // Smooth global scrolling with Lenis
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false,
+      touchMultiplier: 2,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(lenis.raf);
+    };
+  }, []);
+
+  // GSAP ScrollTrigger reveal animations
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Section title/header reveals
+    ScrollTrigger.batch(".section-reveal", {
+      onEnter: (elements) => {
+        gsap.fromTo(
+          elements,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.12,
+            duration: 0.9,
+            ease: "power3.out",
+            overwrite: true,
+          }
+        );
+      },
+      start: "top 88%",
+      once: true,
+    });
+
+    // Individual card/item reveals with stagger
+    ScrollTrigger.batch(".item-reveal", {
+      onEnter: (elements) => {
+        gsap.fromTo(
+          elements,
+          { opacity: 0, y: 35, scale: 0.97 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            stagger: 0.1,
+            duration: 0.7,
+            ease: "power3.out",
+            overwrite: true,
+          }
+        );
+      },
+      start: "top 85%",
+      once: true,
+    });
+
+    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
+  }, []);
+
+  // Scroll progress tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      setScrollProgress(progress);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Active section tracking via IntersectionObserver
+  useEffect(() => {
+    const sections = ["Home", "Skills", "Projects", "Education", "Contact"];
+    const observerOptions = {
+      root: null,
+      rootMargin: "-50% 0px -50% 0px",
+      threshold: 0,
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionName = entry.target.getAttribute("id")?.replace("section-", "");
+          if (sectionName) setActiveSection(sectionName);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => {
+      const el = document.getElementById(`section-${section}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -72,6 +186,7 @@ const App = () => {
         { name: "EXPRESS.JS", icon: "./express-js.png", size: "40px" },
         { name: "FASTAPI", icon: "./fastapi.svg", size: "40px" },
         { name: "SOCKET.IO", icon: "./Socket-io.svg", size: "40px" },
+        { name: "SPRING BOOT", icon: "https://cdn.simpleicons.org/springboot/6DB33F", size: "40px" },
       ],
     },
     {
@@ -90,6 +205,8 @@ const App = () => {
         { name: "FIGMA", icon: "./figma.webp", size: "51px" },
         { name: "POSTMAN", icon: "./postman.webp", size: "35px" },
         { name: "SWAGGER", icon: "./swagger-logo.png", size: "35px" },
+        { name: "CLAUDE CODE", icon: "https://cdn.simpleicons.org/anthropic/D97757", size: "35px" },
+        { name: "ANTIGRAVITY", icon: "https://cdn.simpleicons.org/codemagic/white", size: "35px" },
       ],
     },
     {
@@ -98,6 +215,7 @@ const App = () => {
         { name: "LANG CHAIN", icon: "./langchain.webp", size: "45px" },
         { name: "LANG GRAPH", icon: "./langgraph (1).png", size: "45px" },
         { name: "LANG SMITH", icon: "./langsmith.png", size: "45px" },
+        { name: "CREW AI", icon: "https://cdn.simpleicons.org/probot/white", size: "45px" },
       ],
     },
   ];
@@ -257,12 +375,59 @@ const App = () => {
           disableRotation={false}
         />
       </div>
-      <div className="relative z-10">
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, filter: "blur(10px)", y: 20 }}
+          animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="relative z-10"
+        >
+          {/* Scroll Progress Bar */}
+          <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-slate-900/50">
+            <div
+              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 transition-[width] duration-150 scroll-progress"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
+
+        {/* Section Dot Indicators */}
+        <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3 items-center">
+          {["Home", "Skills", "Projects", "Education", "Contact"].map((section) => (
+            <button
+              key={section}
+              className={`group relative flex items-center transition-all duration-300 ${
+                activeSection === section ? "scale-100" : "scale-90"
+              }`}
+              onClick={() => {
+                document.getElementById(`section-${section}`)?.scrollIntoView({ behavior: "smooth" });
+              }}
+              title={section}
+              aria-label={`Navigate to ${section}`}
+            >
+              <span
+                className={`absolute right-6 px-2 py-1 rounded bg-slate-800/90 border border-slate-700/50 text-[10px] font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none ${
+                  activeSection === section ? "text-indigo-300" : "text-slate-400"
+                }`}
+              >
+                {section.toLowerCase()}
+              </span>
+              <span
+                className={`block rounded-full transition-all duration-300 ${
+                  activeSection === section
+                    ? "w-3 h-3 bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+                    : "w-2 h-2 bg-slate-600 hover:bg-slate-400"
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+
         <div className="flex justify-center">
           <Navbar />
         </div>
         <Element
           name="Home"
+          id="section-Home"
           className="min-h-screen w-full justify-center items-center pt-24 flex lg:flex-row lg2:flex-row flex-col-reverse overflow-hidden px-4"
         >
           <div className="lg:w-[55%] lg2:w-[55%] lg:h-full lg2:h-full w-full h-auto flex flex-col justify-center items-center py-8">
@@ -314,18 +479,26 @@ const App = () => {
                   </p>
                 </div>
                 <div className="flex gap-4 mt-6">
-                  <a 
-                    href="#Contact" 
+                  <Link 
+                    to="Contact" 
+                    smooth="easeInOutQuart"
+                    duration={1200}
+                    spy={true}
+                    offset={-90}
                     className="px-6 py-3 font-semibold rounded-xl ui-btn-primary ui-glow hover:scale-105 transition-transform duration-300"
                   >
                     ./contact.sh
-                  </a>
-                  <a 
-                    href="#Projects" 
+                  </Link>
+                  <Link 
+                    to="Projects" 
+                    smooth="easeInOutQuart"
+                    duration={1200}
+                    spy={true}
+                    offset={-90}
                     className="px-6 py-3 font-semibold rounded-xl ui-btn-ghost ui-glow"
                   >
                     --view-projects
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="w-full relative z-9 mt-6">
@@ -369,14 +542,19 @@ const App = () => {
         </Element>
         <Element
           name="Skills"
+          id="section-Skills"
           className="min-h-screen p-3 w-full flex flex-col justify-start items-center pt-24"
         >
-          <div className="flex flex-col items-center gap-2 mb-12">
-            <span className="text-indigo-400 text-sm font-medium tracking-widest uppercase">What I Know</span>
-            <h1 className="text-white text-4xl md:text-5xl font-bold">Skills & Technologies</h1>
-            <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-blue-900 mx-auto rounded-full"></div>
-            <p className="text-slate-400 text-lg text-center max-w-2xl mt-4">
-              A diverse toolkit built through hands-on projects and continuous learning
+          <div className="flex flex-col items-center md:items-start w-full max-w-6xl mx-auto gap-4 mb-16 px-4 sm:px-6 lg:px-8 section-reveal">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-mono tracking-wider ui-glow">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              $ ls ./skills/
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-indigo-200 to-blue-700 bg-clip-text text-transparent">
+              Skills_&_Technologies
+            </h1>
+            <p className="text-slate-400 text-lg font-mono text-center md:text-left max-w-2xl">
+              // A diverse toolkit built through hands-on projects and continuous learning
             </p>
           </div>
           <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -392,7 +570,7 @@ const App = () => {
                       glare: true,
                       "max-glare": 0.2,
                     }}
-                    className="w-full max-w-[340px]"
+                    className="w-full max-w-[340px] item-reveal"
                   >
                     <div className="bg-slate-900 border border-slate-700/50 h-[360px] rounded-xl backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden ui-glow">
                       <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center justify-between">
@@ -446,15 +624,22 @@ const App = () => {
         </Element>
         <Element
           name="Projects"
+          id="section-Projects"
           className="min-h-screen w-full flex flex-col justify-start items-center p-3 pt-24"
         >
-          <div className="flex flex-col items-center gap-2 mb-12 w-full max-w-4xl mx-auto">
-            <span className="text-indigo-400 text-sm font-medium tracking-widest uppercase">Featured Projects</span>
-            <h1 className="text-white text-4xl md:text-5xl font-bold mt-2">Featured Projects</h1>
-            <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-blue-900 mx-auto rounded-full mt-4"></div>
-            <p className="text-slate-400 text-lg font-mono text-center max-w-2xl mt-4">
-              // Real-world applications built with modern technologies
-            </p>
+          <div className="flex flex-col items-center md:items-start w-full max-w-6xl mx-auto gap-4 mb-16 px-4 section-reveal">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-mono tracking-wider ui-glow">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              $ ./display_projects.sh --featured
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-indigo-200 to-blue-700 bg-clip-text text-transparent">
+              Featured_Projects
+            </h1>
+            <div className="w-full flex justify-center md:justify-start">
+              <p className="text-slate-400 text-lg font-mono text-center md:text-left">
+                // Real-world applications built with modern technologies
+              </p>
+            </div>
           </div>
 
           <div className="relative flex lg:flex-row lg2:flex-row flex-col mt-5 gap-8 justify-center items-center w-full max-w-6xl transition-all">
@@ -463,7 +648,7 @@ const App = () => {
                 {openpro !== pro.id ? (
                   <div
                     onClick={() => setopenpro(pro.id)}
-                    className="w-[340px] h-[480px] transition-all flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow"
+                    className="w-[340px] h-[480px] transition-all flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow item-reveal"
                   >
                     <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
                        <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
@@ -602,16 +787,23 @@ const App = () => {
 
         <Element
           name="Education"
+          id="section-Education"
           className="py-24 pb-24 px-4 w-full"
         >
-          <div className="text-center mb-16">
-            <span className="text-indigo-400 text-sm font-mono tracking-widest uppercase">git log --oneline</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mt-2 font-mono">Education</h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-indigo-500 to-blue-900 mx-auto rounded-full mt-4"></div>
-            <p className="text-slate-400 mt-4 text-lg max-w-2xl mx-auto font-mono text-sm leading-relaxed">
-              // git diff --stat<br/>
-              A foundation built on continuous learning and academic excellence
-            </p>
+          <div className="flex flex-col items-center md:items-start w-full max-w-4xl mx-auto gap-4 mb-16 px-4 section-reveal">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-mono tracking-wider ui-glow">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              $ git log --oneline
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-indigo-200 to-blue-700 bg-clip-text text-transparent font-mono">
+              Education
+            </h1>
+            <div className="w-full flex justify-center md:justify-start">
+              <p className="text-slate-400 text-lg font-mono text-center md:text-left leading-relaxed">
+                // git diff --stat<br/>
+                // A foundation built on continuous learning
+              </p>
+            </div>
           </div>
 
           <div className="relative w-full max-w-4xl mx-auto px-2 py-10">
@@ -620,7 +812,7 @@ const App = () => {
             {education.map((edu, index) => (
               <div
                 key={edu.id}
-                className={`relative flex items-start mb-12 w-full ${
+                className={`relative flex items-start mb-12 w-full item-reveal ${
                   index % 2 === 0 ? "md:justify-start" : "md:justify-end"
                 }`}
               >
@@ -670,12 +862,22 @@ const App = () => {
         </Element>
         <Element
           name="Contact"
+          id="section-Contact"
           className="min-h-screen w-full flex flex-col justify-start items-center pt-24 px-4 max-w-7xl mx-auto"
         >
-          <div className="flex flex-col items-center gap-2 mb-12 w-full">
-            <span className="text-indigo-400 text-sm font-mono uppercase tracking-widest">contact.sh --init</span>
-            <h1 className="text-white text-4xl md:text-5xl font-bold font-mono">Contact Me</h1>
-            <div className="h-px w-20 bg-gradient-to-r from-indigo-500 via-blue-900 to-indigo-500 mx-auto mt-4"></div>
+          <div className="flex flex-col items-center md:items-start w-full max-w-5xl mx-auto gap-4 mb-16 px-4 section-reveal">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-mono tracking-wider ui-glow">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              $ ./contact_me.sh --init
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-indigo-200 to-blue-700 bg-clip-text text-transparent font-mono">
+              Contact_Me
+            </h1>
+            <div className="w-full flex justify-center md:justify-start">
+              <p className="text-slate-400 text-lg font-mono text-center md:text-left">
+                // Let's build something amazing together
+              </p>
+            </div>
           </div>
 
           <div className="w-full flex lg:flex-row flex-col gap-12 items-start justify-center">
@@ -752,17 +954,17 @@ const App = () => {
                     Currently open for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!
                   </p>
                   
-                  <div className="text-indigo-400 mt-8 mb-4 text-sm">$ ./get_resume.sh</div>
-                  <a 
-                    href="/resume.pdf" 
-                    download="Hatim_Malak_Resume.pdf"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 py-3 rounded-lg ui-btn-ghost ui-glow group border-indigo-500/30 text-indigo-300"
-                  >
-                    <svg className="w-5 h-5 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download Resume
-                  </a>
+                  <div className="text-indigo-400 mt-8 mb-4 text-sm">$ cat core_traits.json</div>
+                  <div className="bg-slate-950/50 border border-slate-800/50 rounded-lg p-4 font-mono text-sm text-slate-400">
+                    <span className="text-slate-500">{'{'}</span>
+                    <ul className="pl-6 space-y-2 my-2">
+                      <li><span className="text-indigo-300">"logical_thinking"</span>: <span className="text-green-400">true</span>,</li>
+                      <li><span className="text-indigo-300">"team_collaboration"</span>: <span className="text-green-400">true</span>,</li>
+                      <li><span className="text-indigo-300">"fast_learner"</span>: <span className="text-green-400">true</span>,</li>
+                      <li><span className="text-indigo-300">"problem_solving"</span>: <span className="text-yellow-300">"efficient"</span></li>
+                    </ul>
+                    <span className="text-slate-500">{'}'}</span>
+                  </div>
                 </div>
 
                 <div className="bg-slate-900/60 border border-slate-700/50 rounded-xl p-6 w-full ui-glow">
@@ -796,8 +998,9 @@ const App = () => {
             <Footer />
           </div>
         </Element>
-      </div>
-      <Toaster />
+        <Toaster />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
