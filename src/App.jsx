@@ -30,6 +30,7 @@ import { Link } from "react-scroll";
 import Footer from "./components/Footer.jsx";
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from "react-dom";
 import { GitHubCalendar } from 'react-github-calendar';
 const App = () => {
   const form = useRef();
@@ -433,6 +434,7 @@ const App = () => {
       degree: "CBSE(X) - Science with Computer Application",
     },
   ];
+  const selectedProject = projects.find(p => p.id === openpro);
   return (
     <div className="relative w-full min-h-screen bg-[#0a0a0f] overflow-hidden">
       <div className="fixed top-0 left-0 w-full h-full z-0">
@@ -714,143 +716,169 @@ const App = () => {
             <div className="relative flex lg:flex-row lg2:flex-row flex-col mt-5 gap-8 justify-center items-center w-full max-w-6xl transition-all">
               {projects.map((pro) => (
                 <React.Fragment key={pro.id}>
-                  {openpro !== pro.id ? (
-                    <div
-                      onClick={() => setopenpro(pro.id)}
-                      className="w-[340px] h-[480px] transition-all flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow item-reveal"
-                    >
-                      <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
-                        <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
-                        <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
-                        <span className="ml-2 text-slate-400">{pro.name.toLowerCase().replace(/\s+/g, '')}.jsx</span>
+                  <div
+                    onClick={() => setopenpro(pro.id)}
+                    className="w-[340px] h-[480px] transition-all flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow item-reveal"
+                  >
+                    <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
+                      <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
+                      <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
+                      <span className="ml-2 text-slate-400">{pro.name.toLowerCase().replace(/\s+/g, '')}.jsx</span>
+                    </div>
+                    <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
+                      <img
+                        src={pro.img}
+                        alt="pro"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
+                        ./view_details.sh
                       </div>
-                      <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
-                        <img
-                          src={pro.img}
-                          alt="pro"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                        <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
-                          ./view_details.sh
-                        </div>
-                      </div>
-                      <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
-                        <h1 className="text-xl text-white font-bold font-mono text-indigo-300">
-                          {pro.name}
-                        </h1>
-                        <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
+                    </div>
+                    <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
+                      <h1 className="text-xl text-white font-bold font-mono text-indigo-300">
+                        {pro.name}
+                      </h1>
+                      <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
                         // {pro.skills.length} technologies used
-                        </div>
-                        <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
-                          {pro.description}
-                        </p>
-                        <div className="flex flex-wrap gap-2 mt-auto">
-                          {pro.skills.slice(0, 3).map((skill) => (
-                            <div
-                              key={skill}
-                              className="ui-chip ui-glow"
-                            >
-                              [{skill}]
-                            </div>
-                          ))}
-                          {pro.skills.length > 3 && (
-                            <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
-                              +{pro.skills.length - 3}
-                            </div>
-                          )}
-                        </div>
+                      </div>
+                      <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
+                        {pro.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-auto">
+                        {pro.skills.slice(0, 3).map((skill) => (
+                          <div
+                            key={skill}
+                            className="ui-chip ui-glow"
+                          >
+                            [{skill}]
+                          </div>
+                        ))}
+                        {pro.skills.length > 3 && (
+                          <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
+                            +{pro.skills.length - 3}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  ) : (
-                    <div className="fixed inset-0 h-screen z-[99] flex justify-center items-center bg-black/70 backdrop-blur-md overflow-y-auto py-10 px-4">
-                      <div className="w-full max-w-4xl bg-slate-900 text-white rounded-xl flex flex-col overflow-hidden shadow-2xl border border-slate-700 font-mono text-sm relative ui-glow">
-                        <div className="w-full bg-slate-800/80 border-b border-slate-700/50 flex items-center justify-between pr-4 sticky top-0 z-10">
-                          <div className="flex items-center">
-                            <div className="flex items-center gap-2 px-4 border-r border-slate-700/50 h-full py-3">
-                              <span className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:opacity-80" onClick={() => setopenpro(null)}></span>
-                              <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-                              <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                            </div>
-                            <div className="bg-slate-900 border-r border-slate-700/50 px-4 py-3 text-indigo-400 text-xs flex items-center gap-2">
-                              <span className="text-slate-500">📄</span> {pro.name.toLowerCase().replace(/\s+/g, '')}.jsx
-                            </div>
-                            <div className="px-4 py-3 text-slate-500 text-xs hidden sm:block">
-                              package.json
-                            </div>
-                          </div>
-                          <X
-                            onClick={() => setopenpro(null)}
-                            className="cursor-pointer text-slate-400 hover:text-red-400 transition-colors w-5 h-5"
-                          />
-                        </div>
-                        <div className="flex flex-col lg:flex-row w-full flex-1">
-                          <div className="hidden lg:flex flex-col items-center py-4 bg-slate-900/50 border-r border-slate-800/80 text-slate-700 font-mono text-xs w-10 select-none">
-                            {Array.from({ length: 20 }).map((_, i) => (
-                              <div key={i} className="my-[4px]">{i + 1}</div>
-                            ))}
-                          </div>
-                          <div className="flex flex-col lg:flex-row w-full">
-                            <div className="lg:w-[40%] w-full h-[250px] lg:h-auto relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4">
-                              <div className="w-full h-full lg:rounded-lg overflow-hidden lg:border border-slate-700">
-                                <img
-                                  src={pro.img}
-                                  alt="project"
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                            </div>
-                            <div className="lg:w-[60%] w-full p-6 flex flex-col gap-4">
-                              <h1 className="text-2xl font-bold text-indigo-300">
-                                <span className="text-pink-500">const</span> {pro.name.replace(/\s+/g, '')} <span className="text-slate-400">=</span> <span className="text-yellow-300">&#123;</span>
-                              </h1>
-                              <div className="pl-4 lg:pl-6 border-l border-slate-700/50">
-                                <div className="text-slate-400 mb-1">description: <span className="text-green-400">`</span></div>
-                                <p className="text-green-400/90 leading-relaxed text-sm lg:text-sm pl-4 whitespace-pre-line">
-                                  {pro.description}
-                                </p>
-                                <div className="text-green-400 mt-1">`</div>
-                              </div>
-
-                              <div className="text-slate-500 text-xs mt-2 pl-4 lg:pl-6">// {pro.skills.length} technologies used</div>
-                              <div className="flex flex-wrap gap-2 pl-4 lg:pl-6">
-                                {pro.skills.map((skill) => (
-                                  <div
-                                    key={skill}
-                                    className="px-2 py-1 bg-slate-800/70 rounded border border-slate-700/50 text-indigo-300 text-xs ui-glow"
-                                  >
-                                    [{skill}]
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="text-yellow-300 text-2xl font-bold mt-auto pt-4 mb-2">&#125;</div>
-                              <div className="flex gap-4">
-                                <a
-                                  className="flex-1 bg-slate-800/70 text-slate-300 text-center py-2 lg:py-3 text-xs lg:text-sm shadow-md rounded-md hover:bg-slate-700/80 transition-all border border-slate-600 flex items-center justify-center gap-2 ui-glow"
-                                  href={pro.code}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Github size={16} /> git clone
-                                </a>
-                                <a
-                                  className="flex-1 bg-indigo-600/20 text-indigo-300 text-center py-2 lg:py-3 text-xs lg:text-sm shadow-md rounded-md hover:bg-indigo-600/30 transition-all border border-indigo-500/30 flex items-center justify-center gap-2 ui-glow"
-                                  href={pro.live}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <ExternalLink size={16} /> npm start
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </React.Fragment>
               ))}
+              {openpro !== null &&
+                createPortal(
+                  <div
+                    className="fixed inset-0 z-[99] flex justify-center items-center bg-black/70 backdrop-blur-md p-4 sm:p-6"
+                    onClick={() => setopenpro(null)} // 1. Click backdrop to close
+                  >
+                    <div
+                      className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] bg-slate-900 text-white rounded-xl flex flex-col overflow-hidden shadow-2xl border border-slate-700 font-mono text-sm relative ui-glow"
+                      onClick={(e) => e.stopPropagation()} // 2. Prevent clicks inside from closing the modal
+                    >
+                      {/* Header - Stays fixed at the top */}
+                      <div className="w-full bg-slate-800/80 border-b border-slate-700/50 flex items-center justify-between pr-2 sm:pr-4 shrink-0">
+                        <div className="flex items-center h-full">
+                          <div className="flex items-center gap-2 px-4 border-r border-slate-700/50 h-full py-3 sm:py-4">
+                            <span className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:opacity-80" onClick={() => setopenpro(null)}></span>
+                            <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                          </div>
+                          <div className="bg-slate-900 border-r border-slate-700/50 px-3 sm:px-4 py-3 sm:py-4 text-indigo-400 text-xs flex items-center gap-2 truncate max-w-[150px] sm:max-w-none">
+                            <span className="text-slate-500">📄</span> {selectedProject?.name.toLowerCase().replace(/\s+/g, '')}.jsx
+                          </div>
+                          <div className="px-4 py-3 text-slate-500 text-xs hidden sm:block">
+                            package.json
+                          </div>
+                        </div>
+
+                        {/* 3. Larger touch target for mobile close button */}
+                        <button
+                          onClick={() => setopenpro(null)}
+                          className="p-2 mr-1 rounded-md text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-all"
+                          aria-label="Close"
+                        >
+                          <X className="w-6 h-6 sm:w-5 sm:h-5" />
+                        </button>
+                      </div>
+
+                      {/* Scrollable Content Area */}
+                      <div className="flex flex-col lg:flex-row w-full flex-1 overflow-y-auto">
+
+                        {/* Line Numbers (Desktop only) */}
+                        <div className="hidden lg:flex flex-col items-center py-4 bg-slate-900/50 border-r border-slate-800/80 text-slate-700 font-mono text-xs w-10 select-none shrink-0">
+                          {Array.from({ length: 20 }).map((_, i) => (
+                            <div key={i} className="my-[4px]">{i + 1}</div>
+                          ))}
+                        </div>
+
+                        <div className="flex flex-col lg:flex-row w-full">
+                          {/* Image Area - 4. Adjusted mobile height */}
+                          <div className="lg:w-[40%] w-full h-[200px] sm:h-[250px] lg:h-auto relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4 shrink-0">
+                            <div className="w-full h-full lg:rounded-lg overflow-hidden lg:border border-slate-700">
+                              <img
+                                src={selectedProject?.img}
+                                alt="project"
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Text/Details Area - 4. Adjusted padding for mobile */}
+                          <div className="lg:w-[60%] w-full p-4 sm:p-6 flex flex-col gap-3 sm:gap-4">
+                            <h1 className="text-xl sm:text-2xl font-bold text-indigo-300 break-words">
+                              <span className="text-pink-500">const</span> {selectedProject?.name.replace(/\s+/g, '')} <span className="text-slate-400">=</span> <span className="text-yellow-300">&#123;</span>
+                            </h1>
+
+                            <div className="pl-3 sm:pl-4 lg:pl-6 border-l border-slate-700/50">
+                              <div className="text-slate-400 mb-1 text-xs sm:text-sm">description: <span className="text-green-400">`</span></div>
+                              <p className="text-green-400/90 leading-relaxed text-xs sm:text-sm pl-2 sm:pl-4 whitespace-pre-line">
+                                {selectedProject?.description}
+                              </p>
+                              <div className="text-green-400 mt-1 text-xs sm:text-sm">`</div>
+                            </div>
+
+                            <div className="text-slate-500 text-xs mt-2 pl-3 sm:pl-4 lg:pl-6">// {selectedProject?.skills.length} technologies used</div>
+
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-3 sm:pl-4 lg:pl-6">
+                              {selectedProject?.skills.map((skill) => (
+                                <div
+                                  key={skill}
+                                  className="px-2 py-1 bg-slate-800/70 rounded border border-slate-700/50 text-indigo-300 text-[10px] sm:text-xs ui-glow"
+                                >
+                                  [{skill}]
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="text-yellow-300 text-xl sm:text-2xl font-bold mt-auto pt-4 mb-2">&#125;</div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
+                              <a
+                                className="flex-1 bg-slate-800/70 text-slate-300 text-center py-2.5 sm:py-3 text-sm shadow-md rounded-md hover:bg-slate-700/80 transition-all border border-slate-600 flex items-center justify-center gap-2 ui-glow"
+                                href={selectedProject?.code}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Github size={18} /> git clone
+                              </a>
+                              <a
+                                className="flex-1 bg-indigo-600/20 text-indigo-300 text-center py-2.5 sm:py-3 text-sm shadow-md rounded-md hover:bg-indigo-600/30 transition-all border border-indigo-500/30 flex items-center justify-center gap-2 ui-glow"
+                                href={selectedProject?.live}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink size={18} /> npm start
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
             </div>
           </Element>
 
