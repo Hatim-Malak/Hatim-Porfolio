@@ -404,6 +404,15 @@ const App = () => {
       code: "https://github.com/Hatim-Malak/E-book",
       live: "https://e-book-psi-nine.vercel.app/",
     },
+    {
+      id: 3,
+      img: "./routinex.png",
+      name: "RoutineX",
+      description: "RoutineX10 is a full-stack routine tracking application built with Java Spring Boot and a modern React frontend, designed to help users manage daily tasks, build consistent habits, and track productivity. It features secure JWT-based authentication with token blacklisting, a layered backend architecture (controllers, services, repositories, DTOs), and complete CRUD functionality for routine management with scheduling support. The app also provides analytics like daily tracking, 30-day history, and consistency insights, while using Zustand, Axios, and toast notifications on the frontend, along with Docker-ready deployment for scalability.",
+      skills:["React.js","Java Spring Boot","Docker","JWT","Zustand","Axios","Toast Notifications"],
+      code:"https://github.com/Hatim-Malak/RoutineX10",
+      live:"https://routinex10.vercel.app/"
+    }
   ];
   const education = [
     {
