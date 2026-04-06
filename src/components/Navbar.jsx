@@ -20,7 +20,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="fixed top-5 left-1/2 transform -translate-x-1/2 lg:w-[72%] lg2:w-[86%] w-[96%] lg:flex lg2:flex hidden px-4 py-3 justify-between items-center z-[999] backdrop-blur-xl ui-panel ui-glow bg-gradient-to-r from-indigo-500/20 via-slate-900/40 to-blue-900/20 border-indigo-500/20">
+      <div className="fixed top-5 left-1/2 transform -translate-x-1/2 lg:w-[72%] lg2:w-[86%] w-[96%] lg:flex lg2:flex hidden px-4 py-3 justify-between items-center z-[70] backdrop-blur-xl ui-panel ui-glow bg-gradient-to-r from-indigo-500/20 via-slate-900/40 to-blue-900/20 border-indigo-500/20">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-indigo-500/25 to-blue-900/20 blur-xl opacity-60"></div>

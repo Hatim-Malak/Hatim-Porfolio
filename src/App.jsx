@@ -25,7 +25,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
-import { Loader, ExternalLink, X, Github, Linkedin, Mail } from "lucide-react";
+import { Loader, ExternalLink, X, Github, Linkedin, Mail, ChevronLeft } from "lucide-react";
 import { Link } from "react-scroll";
 import Footer from "./components/Footer.jsx";
 import Lenis from 'lenis';
@@ -41,6 +41,16 @@ const App = () => {
   const [githubStats, setGithubStats] = useState({ repos: 0, totalStars: 0, followers: 0, following: 0, topLangs: [] });
 
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState(null);
+
+  const handleSkillClick = (item, categoryTitle) => {
+    setSelectedSkill({ ...item, category: categoryTitle });
+  };
+
+  const handleBackToGrid = (e) => {
+    e.stopPropagation();
+    setSelectedSkill(null);
+  };
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -245,50 +255,292 @@ const App = () => {
     {
       title: "Frontend",
       items: [
-        { name: "HTML", icon: "./html1.png", size: "40px" },
-        { name: "CSS", icon: "./css2.webp", size: "34px" },
-        { name: "JAVASCRIPT", icon: "./javascript.webp", size: "40px" },
-        { name: "REACT", icon: "./React-icon.svg.png", size: "40px" },
-        { name: "TAILWIND CSS", icon: "./tailwindcss-icon.svg", size: "33px" },
+        { 
+          name: "HTML", 
+          icon: "./html1.png", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 90,
+            description: "The standard markup language for creating web pages and web applications. Forms the structural foundation of all websites.",
+            experience: "Used for semantic markup, accessibility optimization, and SEO-friendly structure across all portfolio projects."
+          }
+        },
+        { 
+          name: "CSS", 
+          icon: "./css2.webp", 
+          size: "34px",
+          detail: {
+            level: "Advanced",
+            percentage: 88,
+            description: "Style sheet language used for describing the presentation of documents written in HTML. Essential for responsive and visually appealing web designs.",
+            experience: "Implemented complex animations, responsive layouts, and custom design systems. Comfortable with flexbox, grid, and modern CSS features."
+          }
+        },
+        { 
+          name: "JAVASCRIPT", 
+          icon: "./javascript.webp", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 85,
+            description: "Versatile programming language that enables interactive web pages and dynamic content. Core technology of the modern web alongside HTML and CSS.",
+            experience: "Built real-time applications, asynchronous data handling, and DOM manipulation. Experienced with ES6+ features and modern async patterns."
+          }
+        },
+        { 
+          name: "REACT", 
+          icon: "./React-icon.svg.png", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 87,
+            description: "JavaScript library for building user interfaces with component-based architecture. Enables efficient rendering with virtual DOM.",
+            experience: "Developed multiple full-stack applications using React. Experienced with hooks, context API, state management, and performance optimization."
+          }
+        },
+        { 
+          name: "TAILWIND CSS", 
+          icon: "./tailwindcss-icon.svg", 
+          size: "33px",
+          detail: {
+            level: "Advanced",
+            percentage: 85,
+            description: "Utility-first CSS framework for rapid UI development. Provides low-level utility classes to build custom designs without leaving HTML.",
+            experience: "Primary CSS framework for recent projects. Implemented responsive designs, dark themes, and custom component libraries."
+          }
+        },
       ],
     },
     {
       title: "Backend",
       items: [
-        { name: "NODE.JS", icon: "./node.png", size: "40px" },
-        { name: "EXPRESS.JS", icon: "./express-js.png", size: "40px" },
-        { name: "FASTAPI", icon: "./fastapi.svg", size: "40px" },
-        { name: "SOCKET.IO", icon: "./Socket-io.svg", size: "40px" },
-        { name: "SPRING BOOT", icon: "https://cdn.simpleicons.org/springboot/6DB33F", size: "40px" },
+        { 
+          name: "NODE.JS", 
+          icon: "./node.png", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 82,
+            description: "JavaScript runtime built on Chrome's V8 engine. Enables server-side execution of JavaScript for building scalable network applications.",
+            experience: "Built RESTful APIs, real-time servers, and backend services. Comfortable with event-driven architecture and non-blocking I/O."
+          }
+        },
+        { 
+          name: "EXPRESS.JS", 
+          icon: "./express-js.png", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 80,
+            description: "Minimal and flexible Node.js web application framework. Provides robust features for building APIs and web applications.",
+            experience: "Created multiple backend APIs with authentication, authorization, and database integration. Familiar with middleware patterns."
+          }
+        },
+        { 
+          name: "FASTAPI", 
+          icon: "./fastapi.svg", 
+          size: "40px",
+          detail: {
+            level: "Intermediate",
+            percentage: 65,
+            description: "Modern Python web framework for building APIs with automatic OpenAPI documentation. Known for high performance and type safety.",
+            experience: "Used for building ML model serving APIs and data processing endpoints. Experienced with Pydantic validation and async patterns."
+          }
+        },
+        { 
+          name: "SOCKET.IO", 
+          icon: "./Socket-io.svg", 
+          size: "40px",
+          detail: {
+            level: "Advanced",
+            percentage: 78,
+            description: "JavaScript library for real-time bidirectional communication. Enables event-based sockets for instant data transfer.",
+            experience: "Implemented real-time chat applications with live messaging, online status, and typing indicators."
+          }
+        },
+        { 
+          name: "SPRING BOOT", 
+          icon: "https://cdn.simpleicons.org/springboot/6DB33F", 
+          size: "40px",
+          detail: {
+            level: "Intermediate",
+            percentage: 60,
+            description: "Java-based framework for creating stand-alone, production-grade Spring applications. Simplifies Spring configuration and deployment.",
+            experience: "Built backend services for RoutineX10 app. Familiar with dependency injection, REST controllers, and Spring Data JPA."
+          }
+        },
       ],
     },
     {
       title: "Languages",
       items: [
-        { name: "C", icon: "./c.webp", size: "45px" },
-        { name: "C++", icon: "./c++.png", size: "40px", height: "45px" },
-        { name: "JAVA", icon: "./java.png", size: "35px", height: "50px" },
-        { name: "PYTHON", icon: "./python.png", size: "35px" },
+        { 
+          name: "C", 
+          icon: "./c.webp", 
+          size: "45px",
+          detail: {
+            level: "Intermediate",
+            percentage: 70,
+            description: "General-purpose programming language providing low-level memory access. Foundation for understanding computer science concepts.",
+            experience: "Learned programming fundamentals through C. Implemented data structures, algorithms, and system-level programming concepts."
+          }
+        },
+        { 
+          name: "C++", 
+          icon: "./c++.png", 
+          size: "40px", 
+          height: "45px",
+          detail: {
+            level: "Intermediate",
+            percentage: 65,
+            description: "High-performance language extending C with object-oriented features. Widely used in game development, systems programming, and applications.",
+            experience: "Used for competitive programming and understanding OOP concepts. Comfortable with classes, templates, and STL."
+          }
+        },
+        { 
+          name: "JAVA", 
+          icon: "./java.png", 
+          size: "35px", 
+          height: "50px",
+          detail: {
+            level: "Intermediate",
+            percentage: 68,
+            description: "Object-oriented programming language designed to be platform-independent. Popular for enterprise applications and Android development.",
+            experience: "Used for building Spring Boot backend services, data structures, and algorithmic problem-solving. Comfortable with OOP and design patterns."
+          }
+        },
+        { 
+          name: "PYTHON", 
+          icon: "./python.png", 
+          size: "35px",
+          detail: {
+            level: "Advanced",
+            percentage: 82,
+            description: "High-level interpreted language known for readability. Dominant in data science, AI/ML, web development, and automation.",
+            experience: "Primary language for AI/ML projects, data processing scripts, and backend APIs. Experienced with NumPy, Pandas, and scikit-learn."
+          }
+        },
       ],
     },
     {
       title: "Tools",
       items: [
-        { name: "GITHUB", icon: "./github.png", size: "35px" },
-        { name: "FIGMA", icon: "./figma.webp", size: "51px" },
-        { name: "POSTMAN", icon: "./postman.webp", size: "35px" },
-        { name: "SWAGGER", icon: "./swagger-logo.png", size: "35px" },
-        { name: "CLAUDE CODE", icon: "https://cdn.simpleicons.org/anthropic/D97757", size: "35px" },
-        { name: "ANTIGRAVITY", icon: "https://cdn.simpleicons.org/codemagic/white", size: "35px" },
+        { 
+          name: "GITHUB", 
+          icon: "./github.png", 
+          size: "35px",
+          detail: {
+            level: "Advanced",
+            percentage: 85,
+            description: "Cloud-based platform for version control and collaborative software development. Essential for team-based and open-source projects.",
+            experience: "Daily use for version control, pull requests, code reviews, and CI/CD workflows. Manage multiple repositories and organizations."
+          }
+        },
+        { 
+          name: "FIGMA", 
+          icon: "./figma.webp", 
+          size: "51px",
+          detail: {
+            level: "Intermediate",
+            percentage: 55,
+            description: "Collaborative interface design tool for building UI/UX designs. Enables real-time collaboration and prototyping.",
+            experience: "Used for designing portfolio layouts, creating wireframes, and prototyping interactive UI components."
+          }
+        },
+        { 
+          name: "POSTMAN", 
+          icon: "./postman.webp", 
+          size: "35px",
+          detail: {
+            level: "Advanced",
+            percentage: 80,
+            description: "API development environment for building, testing, and documenting APIs. Simplifies API workflows with collections and environments.",
+            experience: "Extensively used for API testing, debugging, and documentation. Created automated test collections for backend services."
+          }
+        },
+        { 
+          name: "SWAGGER", 
+          icon: "./swagger-logo.png", 
+          size: "35px",
+          detail: {
+            level: "Intermediate",
+            percentage: 65,
+            description: "Open-source framework for designing, building, and documenting RESTful APIs. Provides interactive API documentation.",
+            experience: "Integrated Swagger/OpenAPI for automatic API documentation. Used for generating client SDKs and testing endpoints."
+          }
+        },
+        { 
+          name: "CLAUDE CODE", 
+          icon: "https://cdn.simpleicons.org/anthropic/D97757", 
+          size: "35px",
+          detail: {
+            level: "Advanced",
+            percentage: 88,
+            description: "AI-powered coding assistant by Anthropic. Helps write, review, and debug code with natural language commands.",
+            experience: "Regularly use for code generation, debugging, explaining complex concepts, and accelerating development workflow."
+          }
+        },
+        { 
+          name: "ANTIGRAVITY", 
+          icon: "https://cdn.simpleicons.org/codemagic/white", 
+          size: "35px",
+          detail: {
+            level: "Intermediate",
+            percentage: 60,
+            description: "CI/CD tool specifically designed for mobile and web applications. Automates building, testing, and deployment workflows.",
+            experience: "Used for continuous integration pipelines, automated testing, and deployment to app stores and hosting platforms."
+          }
+        },
       ],
     },
     {
       title: "AI Technologies",
       items: [
-        { name: "LANG CHAIN", icon: "./langchain.webp", size: "45px" },
-        { name: "LANG GRAPH", icon: "./langgraph (1).png", size: "45px" },
-        { name: "LANG SMITH", icon: "./langsmith.png", size: "45px" },
-        { name: "CREW AI", icon: "https://cdn.simpleicons.org/probot/white", size: "45px" },
+        { 
+          name: "LANG CHAIN", 
+          icon: "./langchain.webp", 
+          size: "45px",
+          detail: {
+            level: "Intermediate",
+            percentage: 65,
+            description: "Framework for developing applications powered by language models. Provides components for chains, agents, and memory.",
+            experience: "Built LLM-powered applications with retrieval-augmented generation (RAG), custom tools, and conversational agents."
+          }
+        },
+        { 
+          name: "LANG GRAPH", 
+          icon: "./langgraph (1).png", 
+          size: "45px",
+          detail: {
+            level: "Intermediate",
+            percentage: 60,
+            description: "Framework for building stateful, multi-actor applications with LLMs. Enables complex agent workflows and orchestration.",
+            experience: "Implementing agentic workflows with memory, tool use, and multi-step reasoning capabilities."
+          }
+        },
+        { 
+          name: "LANG SMITH", 
+          icon: "./langsmith.png", 
+          size: "45px",
+          detail: {
+            level: "Beginner",
+            percentage: 35,
+            description: "Platform for debugging, testing, and monitoring LLM applications. Provides observability for language model pipelines.",
+            experience: "Using for tracing LangChain applications, evaluating model outputs, and improving prompt engineering."
+          }
+        },
+        { 
+          name: "CREW AI", 
+          icon: "https://cdn.simpleicons.org/probot/white", 
+          size: "45px",
+          detail: {
+            level: "Intermediate",
+            percentage: 55,
+            description: "Framework for building AI agent teams that collaborate to complete complex tasks. Implements multi-agent orchestration.",
+            experience: "Building autonomous agent systems where multiple AI agents work together with specialized roles and tools."
+          }
+        },
       ],
     },
   ];
@@ -618,10 +870,11 @@ const App = () => {
                         glare: true,
                         "max-glare": 0.2,
                       }}
-                      className="w-full max-w-[340px] item-reveal"
+                      className="w-[340px] h-[380px] item-reveal"
                     >
-                      <div className="bg-slate-900 border border-slate-700/50 h-[360px] rounded-xl backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden ui-glow">
-                        <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center justify-between">
+                      <div className="bg-slate-900 border border-slate-700/50 w-[340px] h-[380px] rounded-xl backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden ui-glow">
+                        {/* Terminal Title Bar */}
+                        <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center justify-between shrink-0">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
                             <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
@@ -629,38 +882,149 @@ const App = () => {
                           </div>
                           <span className="text-slate-500 text-xs font-mono">skills/{category.title.toLowerCase().replace(/\s+/g, '-')}.json</span>
                         </div>
-                        <div className="p-6 flex flex-col">
-                          <div className="mb-6 mt-2">
-                            <h2 className="text-xl font-bold flex items-center gap-2">
+
+                        {/* Card Body — fixed remaining height */}
+                        <div className="flex-1 flex flex-col overflow-hidden p-4">
+                          {/* Title Row */}
+                          <div className="shrink-0 mb-3">
+                            <h2 className="text-lg font-bold flex items-center gap-2">
                               <span className="text-indigo-400 font-mono">$</span>
-                              <span className="text-indigo-300 font-mono">{category.title}</span>
+                              <span className="text-indigo-300 font-mono truncate">
+                                {selectedSkill?.category === category.title 
+                                  ? selectedSkill.name 
+                                  : category.title}
+                              </span>
                             </h2>
-                            <div className="text-slate-600 text-xs font-mono mt-2">
-                              &lt;!-- {category.items.length} items --&gt;
+                            <div className="text-slate-600 text-[10px] font-mono mt-1">
+                              {selectedSkill?.category === category.title 
+                                ? `<-- Inspecting Detail />`
+                                : `<!-- ${category.items.length} items -->`}
                             </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-3 mt-auto">
-                            {category.items.map((item, itemIndex) => (
-                              <div
-                                key={itemIndex}
-                                className="group relative aspect-square flex flex-col items-center justify-center gap-2 rounded-lg bg-slate-900/50 border border-slate-700/30 p-2 hover:bg-gradient-to-br hover:from-indigo-500/10 hover:to-blue-900/10 transition-all duration-300 hover:scale-105 hover:border-indigo-500/30 ui-glow"
-                              >
-                                <div className="flex items-center justify-center flex-1 w-full bg-slate-800/40 rounded-md py-1">
-                                  <img
-                                    src={item.icon}
-                                    alt={item.name}
-                                    className="object-contain transition-transform duration-300 group-hover:scale-110 filter brightness-90 group-hover:brightness-100"
-                                    style={{
-                                      width: item.size,
-                                      height: item.height || item.size,
-                                    }}
-                                  />
-                                </div>
-                                <p className="text-[9px] font-mono text-slate-400 group-hover:text-indigo-300 transition-colors text-center leading-tight line-clamp-2">
-                                  [{item.name}]
-                                </p>
-                              </div>
-                            ))}
+
+                          {/* Content Area */}
+                          <div className="flex-1 relative overflow-hidden">
+                            <AnimatePresence mode="wait">
+                              {selectedSkill?.category === category.title ? (
+                                <motion.div 
+                                  key="detail"
+                                  initial={{ opacity: 0, y: 8 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -8 }}
+                                  transition={{ duration: 0.25 }}
+                                  className="flex flex-col absolute inset-0"
+                                >
+                                  {/* Icon + Progress bar — compact header */}
+                                  <div className="flex gap-3 items-center shrink-0 mb-3">
+                                    <motion.div
+                                      initial={{ scale: 0.6 }}
+                                      animate={{ scale: 1 }}
+                                      transition={{ type: "spring", stiffness: 260, damping: 15 }}
+                                      className="shrink-0 w-12 h-12 bg-slate-800/80 border border-slate-700/50 rounded-lg flex items-center justify-center"
+                                    >
+                                      <img
+                                        src={selectedSkill.icon}
+                                        alt={selectedSkill.name}
+                                        className="w-8 h-8 object-contain filter brightness-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                                      />
+                                    </motion.div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className="px-2 py-0.5 bg-indigo-500/15 border border-indigo-500/25 rounded text-indigo-300 text-[9px] uppercase tracking-wider font-mono">
+                                          {selectedSkill.detail.level}
+                                        </span>
+                                        <span className="text-indigo-400 text-xs font-mono font-bold">
+                                          {selectedSkill.detail.percentage}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+                                        <motion.div
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${selectedSkill.detail.percentage}%` }}
+                                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+                                          className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 rounded-full"
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Description + Experience — scrollable */}
+                                  <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+                                    <motion.div
+                                      initial={{ opacity: 0, y: 6 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ delay: 0.1 }}
+                                      className="bg-slate-800/40 p-2.5 rounded-lg border border-slate-700/40"
+                                    >
+                                      <div className="text-slate-500 text-[10px] uppercase font-mono mb-1 flex items-center gap-1.5">
+                                        <span className="text-indigo-400">#</span> Description
+                                      </div>
+                                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                                        {selectedSkill.detail.description}
+                                      </p>
+                                    </motion.div>
+
+                                    <motion.div
+                                      initial={{ opacity: 0, y: 6 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ delay: 0.2 }}
+                                      className="bg-slate-800/40 p-2.5 rounded-lg border border-slate-700/40"
+                                    >
+                                      <div className="text-slate-500 text-[10px] uppercase font-mono mb-1 flex items-center gap-1.5">
+                                        <span className="text-indigo-400">#</span> Experience
+                                      </div>
+                                      <p className="text-indigo-300/90 text-[11px] leading-relaxed">
+                                        {selectedSkill.detail.experience}
+                                      </p>
+                                    </motion.div>
+                                  </div>
+
+                                  {/* Back button — always visible at bottom */}
+                                  <motion.button
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                    onClick={handleBackToGrid}
+                                    className="shrink-0 w-full mt-2 py-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-300 text-[11px] font-mono hover:bg-slate-700 hover:text-white hover:border-indigo-500/50 hover:shadow-[0_0_10px_rgba(99,102,241,0.15)] transition-all flex items-center justify-center gap-2 group"
+                                  >
+                                    <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                                    ./back_to_grid.sh
+                                  </motion.button>
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  key="grid"
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.95 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="grid grid-cols-3 gap-2.5 content-start absolute inset-0"
+                                >
+                                  {category.items.map((item, itemIndex) => (
+                                    <div
+                                      key={itemIndex}
+                                      onClick={() => handleSkillClick(item, category.title)}
+                                      className="group relative aspect-square flex flex-col items-center justify-center gap-1 rounded-lg bg-slate-900/50 border border-slate-700/30 p-2 hover:bg-gradient-to-br hover:from-indigo-500/10 hover:to-blue-900/10 transition-all duration-300 hover:scale-105 hover:border-indigo-500/30 cursor-pointer ui-glow hover:shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                                    >
+                                      <div className="flex items-center justify-center flex-1 w-full">
+                                        <img
+                                          src={item.icon}
+                                          alt={item.name}
+                                          className="object-contain transition-all duration-300 group-hover:scale-110 filter brightness-90 group-hover:brightness-100 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                          style={{
+                                            width: item.size,
+                                            height: item.height || item.size,
+                                          }}
+                                        />
+                                      </div>
+                                      <p className="text-[9px] font-mono text-slate-400 group-hover:text-indigo-300 transition-colors text-center leading-tight line-clamp-2">
+                                        [{item.name}]
+                                      </p>
+                                    </div>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
                         </div>
                       </div>
