@@ -30,6 +30,17 @@
 
 ---
 
+## Phase 03: Interactive Skill Details
+
+**Goal:** Add click-to-expand skill details in the skills section, showing what each skill is and how it relates to the user - displayed inline within the same card.
+
+**Requirements:** [SKILL-01]
+
+**Plans:**
+- [ ] 03-01-PLAN.md — Interactive skill detail cards with inline expansion
+
+---
+
 ## Requirements
 
 | ID | Description | Phase |
@@ -42,4 +53,5 @@
 | SA-01 | Section reveal animations on scroll | 02 |
 | SA-02 | Navigation progress indicator | 02 |
 | SA-03 | Smooth scroll behavior enhancements | 02 |
+| SKILL-01 | Click-to-expand skill details with description and experience | 03 |
 
