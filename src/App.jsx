@@ -29,8 +29,7 @@ import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from "react-dom";
 
-// --- PERFORMANCE OPTIMIZATION: Lazy load heavy components ---
-const GitHubCalendar = lazy(() =>
+const GitHubCalendar = lazy(() => 
   import('react-github-calendar').then(module => ({ default: module.GitHubCalendar }))
 );
 import Tilt from "react-parallax-tilt";
@@ -45,8 +44,11 @@ const App = () => {
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
-  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-  const [showParticles, setShowParticles] = useState(false); // For deferring particles
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0); 
+  const [showParticles, setShowParticles] = useState(false); 
+
+  // --- PERSISTENCE STATE: Store projects locally ---
+  const [displayProjects, setDisplayProjects] = useState([]);
 
   const carouselHovered = useRef(false);
   const trackRef = useRef(null);
@@ -60,27 +62,45 @@ const App = () => {
     setSelectedSkill(null);
   };
 
-  const { isgettingProject, getProject, projects } = useAgent();
-
+  // Rename projects from store to storeProjects to avoid collision
+  const { isgettingProject, getProject, projects: storeProjects } = useAgent();
+  
+  // --- CACHING LOGIC ---
   useEffect(() => {
+    // 1. Immediately load from cache on mount
+    const cachedProjects = localStorage.getItem('portfolio_projects');
+    if (cachedProjects) {
+      try {
+        setDisplayProjects(JSON.parse(cachedProjects));
+      } catch (e) {
+        console.error("Failed to parse cached projects");
+      }
+    }
+    // 2. Try to fetch fresh data
     getProject();
   }, []);
 
   useEffect(() => {
+    // 3. If fetch succeeds, update display AND cache
+    if (storeProjects && storeProjects.length > 0) {
+      setDisplayProjects(storeProjects);
+      localStorage.setItem('portfolio_projects', JSON.stringify(storeProjects));
+    }
+  }, [storeProjects]);
+  // ---------------------
+
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile(); // Check on initial load
+    checkMobile(); 
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // --- PERFORMANCE OPTIMIZATION: Defer Particle Rendering ---
   useEffect(() => {
-    // Wait for the main thread to paint critical content first
     const timer = setTimeout(() => setShowParticles(true), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  // --- PERFORMANCE OPTIMIZATION: Cache GitHub API Calls ---
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -136,8 +156,6 @@ const App = () => {
     fetchData();
   }, []);
 
-  // Smooth global scrolling with Lenis - DESKTOP ONLY
-  // Smooth global scrolling with Lenis - DESKTOP ONLY
   useEffect(() => {
     if (window.innerWidth < 768) return;
 
@@ -158,30 +176,24 @@ const App = () => {
     });
     gsap.ticker.lagSmoothing(0);
 
-    // --- ADD THIS BLOCK ---
-    // Wait for elements to paint and Lenis to initialize, 
-    // then tell GSAP to recalculate all animation trigger positions.
     const timeoutId = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 500);
-    // ----------------------
 
     return () => {
-      clearTimeout(timeoutId); // Clean up the timeout
+      clearTimeout(timeoutId); 
       lenis.destroy();
       gsap.ticker.remove(lenis.raf);
     };
   }, []);
 
-  // GSAP ScrollTrigger reveal animations
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // gsap.context creates a safe boundary that we can easily clean up
     let ctx = gsap.context(() => {
       ScrollTrigger.batch(".section-reveal", {
         onEnter: (elements) => {
-          gsap.fromTo(elements,
+          gsap.fromTo(elements, 
             { opacity: 0, y: 30 },
             { opacity: 1, y: 0, stagger: 0.12, duration: 0.9, ease: "power3.out", overwrite: true }
           );
@@ -192,7 +204,7 @@ const App = () => {
 
       ScrollTrigger.batch(".item-reveal", {
         onEnter: (elements) => {
-          gsap.fromTo(elements,
+          gsap.fromTo(elements, 
             { opacity: 0, y: 35, scale: 0.97 },
             { opacity: 1, y: 0, scale: 1, stagger: 0.1, duration: 0.7, ease: "power3.out", overwrite: true }
           );
@@ -202,12 +214,20 @@ const App = () => {
       });
     });
 
-    // This completely kills the animations when the component unmounts
-    return () => ctx.revert();
+    return () => ctx.revert(); 
   }, []);
 
+  // --- PERFORMANCE: Prevent Forced Reflows ---
+  // Recalculate ScrollTriggers AFTER dynamic data arrives and expands the page
+  useEffect(() => {
+    if (displayProjects.length > 0 || githubStats.repos > 0) {
+      const timeout = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 300); // Give React 300ms to paint the new DOM nodes
+      return () => clearTimeout(timeout);
+    }
+  }, [displayProjects, githubStats]);
 
-  // Active section tracking via IntersectionObserver
   useEffect(() => {
     const sections = ["Home", "Skills", "Projects", "GitHub", "Education", "Contact"];
     const observerOptions = {
@@ -235,25 +255,26 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Update these effect dependencies to use displayProjects
   useEffect(() => {
-    if (projects && projects.length > 0) {
-      setActiveProjectIndex(projects.length);
+    if (displayProjects && displayProjects.length > 0) {
+      setActiveProjectIndex(displayProjects.length);
     }
-  }, [projects]);
+  }, [displayProjects]);
 
   useEffect(() => {
-    if (openpro !== null || !projects || projects.length === 0) return;
+    if (openpro !== null || !displayProjects || displayProjects.length === 0) return;
     const interval = setInterval(() => {
       if (!carouselHovered.current) {
         setActiveProjectIndex((prev) => prev + 1);
       }
     }, 3500);
     return () => clearInterval(interval);
-  }, [openpro, projects]);
+  }, [openpro, displayProjects]);
 
   useEffect(() => {
-    if (!projects || projects.length === 0) return;
-    const len = projects.length;
+    if (!displayProjects || displayProjects.length === 0) return;
+    const len = displayProjects.length;
 
     if (activeProjectIndex >= len * 2 || activeProjectIndex < len) {
       const timer = setTimeout(() => {
@@ -275,7 +296,7 @@ const App = () => {
       }, 720);
       return () => clearTimeout(timer);
     }
-  }, [activeProjectIndex, projects]);
+  }, [activeProjectIndex, displayProjects]);
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -640,7 +661,8 @@ const App = () => {
     },
   ];
 
-  const selectedProject = projects?.find(p => p.id === openpro);
+  // Map over displayProjects for modals
+  const selectedProject = displayProjects?.find(p => p.id === openpro);
 
   return (
     <div className="relative w-full min-h-screen bg-[#0a0a0f] overflow-hidden">
@@ -649,7 +671,7 @@ const App = () => {
           <Suspense fallback={null}>
             <Particles
               particleColors={["#818cf8", "#c084fc"]}
-              particleCount={isMobile ? 30 : 120} // Reduced particles for performance
+              particleCount={isMobile ? 30 : 120} 
               particleSpread={8}
               speed={0.15}
               particleBaseSize={100}
@@ -699,7 +721,9 @@ const App = () => {
                   <h1 className="text-white lg:text-2xl lg2:text-2xl md:text-xl text-lg font-bold flex flex-wrap items-center gap-2 mt-2">
                     <span className="text-indigo-400">$</span>
                     <span className="text-slate-400">role = "</span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-800 font-mono">
+                    
+                    {/* --- PERFORMANCE CLS FIX: min-w added to reserve space before typing starts --- */}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-800 font-mono inline-block min-w-[200px] sm:min-w-[280px]">
                       <TextType
                         text={[
                           "Software Developer",
@@ -772,7 +796,6 @@ const App = () => {
                   <div className="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-indigo-400 rounded-br-sm opacity-50"></div>
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-blue-900/10"></div>
 
-                  {/* --- PERFORMANCE OPTIMIZATION: LCP Image Prioritization --- */}
                   <img
                     src="./Profile_Photo1.png"
                     alt="Hatim Malak Profile Photo"
@@ -811,8 +834,8 @@ const App = () => {
               <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
                   {skills.map((category, categoryIndex) => (
-                    // --- PERFORMANCE OPTIMIZATION: Lazy loaded component ---
                     <Tilt
+                      key={categoryIndex}
                       tiltEnable={!isMobile}
                       tiltMaxAngleX={8}      
                       tiltMaxAngleY={8}
@@ -1034,10 +1057,10 @@ const App = () => {
                     className="flex transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
                     style={{
                       marginLeft: '50%',
-                      transform: `translateX(-${(isgettingProject ? 2 : activeProjectIndex) * (isMobile ? 312 : 372) + (isMobile ? 156 : 186)}px)`
+                      transform: `translateX(-${(isgettingProject && displayProjects.length === 0 ? 2 : activeProjectIndex) * (isMobile ? 312 : 372) + (isMobile ? 156 : 186)}px)`
                     }}
                   >
-                    {isgettingProject ? (
+                    {isgettingProject && displayProjects.length === 0 ? (
                       [0, 1, 2, 3, 4].map((index) => {
                         const distance = Math.abs(index - 2);
                         return (
@@ -1077,7 +1100,7 @@ const App = () => {
                         );
                       })
                     ) : (
-                      projects && projects.length > 0 && [...projects, ...projects, ...projects].map((pro, index) => {
+                      displayProjects && displayProjects.length > 0 && [...displayProjects, ...displayProjects, ...displayProjects].map((pro, index) => {
                         const distance = Math.abs(index - activeProjectIndex);
                         return (
                           <div
@@ -1101,7 +1124,6 @@ const App = () => {
                               </div>
                               <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
 
-                                {/* --- PERFORMANCE OPTIMIZATION: explicit image size & lazy load --- */}
                                 <img
                                   src={pro.desktop_url || pro.img}
                                   alt={`${pro.title || 'project'} cover`}
@@ -1153,11 +1175,11 @@ const App = () => {
 
               {/* Dot indicators */}
               <div className="flex justify-center gap-3 mt-2">
-                {projects && projects.length > 0 && projects.map((_, index) => (
+                {displayProjects && displayProjects.length > 0 && displayProjects.map((_, index) => (
                   <button
                     key={index}
-                    onClick={() => setActiveProjectIndex(index + projects.length)}
-                    className={`h-2 rounded-full transition-all duration-500 ${index === activeProjectIndex % projects.length
+                    onClick={() => setActiveProjectIndex(index + displayProjects.length)}
+                    className={`h-2 rounded-full transition-all duration-500 ${index === activeProjectIndex % displayProjects.length
                       ? 'bg-indigo-500 w-8 shadow-[0_0_10px_rgba(99,102,241,0.5)]'
                       : 'bg-slate-600 w-2 hover:bg-slate-400'
                       }`}
@@ -1212,7 +1234,6 @@ const App = () => {
                           <div className="lg:w-[40%] w-full h-[200px] sm:h-[250px] lg:h-full relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4 shrink-0 flex flex-col">
                             <div className="w-full h-full lg:rounded-lg overflow-hidden lg:border border-slate-700">
 
-                              {/* --- PERFORMANCE OPTIMIZATION: explicit modal image sizing --- */}
                               <img
                                 src={selectedProject?.desktop_url || selectedProject?.img}
                                 alt="project detailed view"
@@ -1320,7 +1341,6 @@ const App = () => {
                 <div className="w-full bg-slate-950/50 p-4 rounded-lg border border-slate-800/50 overflow-x-auto hide-scrollbar">
                   <div className="min-w-[750px] flex justify-center items-center mx-auto">
 
-                    {/* --- PERFORMANCE OPTIMIZATION: Lazy loaded GitHub Calendar --- */}
                     <Suspense fallback={<div className="min-w-[750px] h-[150px] bg-slate-800/50 animate-pulse rounded-xl"></div>}>
                       <GitHubCalendar
                         username="Hatim-Malak"
@@ -1431,7 +1451,6 @@ const App = () => {
                     <div className="flex items-start gap-4 mb-3 border-b border-slate-800/50 pb-3">
                       <div className="w-12 h-12 bg-white/10 rounded-md overflow-hidden shrink-0 border border-slate-700 mt-1">
 
-                        {/* --- PERFORMANCE OPTIMIZATION: explicit dimension & lazy load --- */}
                         <img
                           src={edu.img}
                           alt={edu.school}
