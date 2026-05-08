@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import DarkVeil from "./components/DarkVeil.jsx";
 import LogoLoop from "./components/LogoLoop.jsx";
 import {
@@ -17,34 +17,37 @@ import { useAgent } from "./store/useAgentStore.js";
 import { TbTopologyStar3 } from "react-icons/tb";
 import { FaBrain } from "react-icons/fa";
 import Navbar from "./components/Navbar.jsx";
-import { Element } from "react-scroll";
-import Tilt from "react-parallax-tilt";
+import { Element, Link } from "react-scroll";
 import TextType from "./components/TextType.jsx";
-import Particles from "./components/Particeles.jsx";
-import { useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
 import { Loader, ExternalLink, X, Github, Linkedin, Mail, ChevronLeft, ChevronRight } from "lucide-react";
-import { Link } from "react-scroll";
 import Footer from "./components/Footer.jsx";
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from "react-dom";
-import { GitHubCalendar } from 'react-github-calendar';
+
+// --- PERFORMANCE OPTIMIZATION: Lazy load heavy components ---
+const GitHubCalendar = lazy(() =>
+  import('react-github-calendar').then(module => ({ default: module.GitHubCalendar }))
+);
+import Tilt from "react-parallax-tilt";
+const Particles = lazy(() => import('./components/Particeles.jsx'));
 
 const App = () => {
   const form = useRef();
   const [load, setload] = useState(false);
   const [openpro, setopenpro] = useState(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("Home");
   const [githubStats, setGithubStats] = useState({ repos: 0, totalStars: 0, followers: 0, following: 0, topLangs: [] });
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
-  const [activeProjectIndex, setActiveProjectIndex] = useState(0); // Changed to 0 initially
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const [showParticles, setShowParticles] = useState(false); // For deferring particles
+
   const carouselHovered = useRef(false);
   const trackRef = useRef(null);
 
@@ -58,7 +61,7 @@ const App = () => {
   };
 
   const { isgettingProject, getProject, projects } = useAgent();
-  
+
   useEffect(() => {
     getProject();
   }, []);
@@ -70,9 +73,23 @@ const App = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // --- PERFORMANCE OPTIMIZATION: Defer Particle Rendering ---
+  useEffect(() => {
+    // Wait for the main thread to paint critical content first
+    const timer = setTimeout(() => setShowParticles(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // --- PERFORMANCE OPTIMIZATION: Cache GitHub API Calls ---
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const cachedStats = sessionStorage.getItem('githubStats');
+        if (cachedStats) {
+          setGithubStats(JSON.parse(cachedStats));
+          return;
+        }
+
         const [userRes, repoRes] = await Promise.all([
           fetch('https://api.github.com/users/Hatim-Malak'),
           fetch('https://api.github.com/users/Hatim-Malak/repos?per_page=100')
@@ -100,13 +117,16 @@ const App = () => {
             percent: Math.max(1, Math.round((size / totalSize) * 100))
           }));
 
-        setGithubStats({
+        const finalStats = {
           repos: userData.public_repos || 0,
           followers: userData.followers || 0,
           following: userData.following || 0,
           totalStars: stars,
           topLangs: sortedLangs
-        });
+        };
+
+        setGithubStats(finalStats);
+        sessionStorage.setItem('githubStats', JSON.stringify(finalStats));
 
       } catch (error) {
         console.error("Error fetching GitHub data:", error);
@@ -116,6 +136,7 @@ const App = () => {
     fetchData();
   }, []);
 
+  // Smooth global scrolling with Lenis - DESKTOP ONLY
   // Smooth global scrolling with Lenis - DESKTOP ONLY
   useEffect(() => {
     if (window.innerWidth < 768) return;
@@ -131,12 +152,22 @@ const App = () => {
     });
 
     lenis.on('scroll', ScrollTrigger.update);
+    
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);
     });
     gsap.ticker.lagSmoothing(0);
 
+    // --- ADD THIS BLOCK ---
+    // Wait for elements to paint and Lenis to initialize, 
+    // then tell GSAP to recalculate all animation trigger positions.
+    const timeoutId = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 500);
+    // ----------------------
+
     return () => {
+      clearTimeout(timeoutId); // Clean up the timeout
       lenis.destroy();
       gsap.ticker.remove(lenis.raf);
     };
@@ -146,61 +177,35 @@ const App = () => {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    ScrollTrigger.batch(".section-reveal", {
-      onEnter: (elements) => {
-        gsap.fromTo(
-          elements,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.12,
-            duration: 0.9,
-            ease: "power3.out",
-            overwrite: true,
-          }
-        );
-      },
-      start: "top 88%",
-      once: true,
+    // gsap.context creates a safe boundary that we can easily clean up
+    let ctx = gsap.context(() => {
+      ScrollTrigger.batch(".section-reveal", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, stagger: 0.12, duration: 0.9, ease: "power3.out", overwrite: true }
+          );
+        },
+        start: "top 88%",
+        once: true,
+      });
+
+      ScrollTrigger.batch(".item-reveal", {
+        onEnter: (elements) => {
+          gsap.fromTo(elements,
+            { opacity: 0, y: 35, scale: 0.97 },
+            { opacity: 1, y: 0, scale: 1, stagger: 0.1, duration: 0.7, ease: "power3.out", overwrite: true }
+          );
+        },
+        start: "top 85%",
+        once: true,
+      });
     });
 
-    ScrollTrigger.batch(".item-reveal", {
-      onEnter: (elements) => {
-        gsap.fromTo(
-          elements,
-          { opacity: 0, y: 35, scale: 0.97 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            stagger: 0.1,
-            duration: 0.7,
-            ease: "power3.out",
-            overwrite: true,
-          }
-        );
-      },
-      start: "top 85%",
-      once: true,
-    });
-
-    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
+    // This completely kills the animations when the component unmounts
+    return () => ctx.revert();
   }, []);
 
-  // Scroll progress tracking
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight <= 0) return;
-
-      const progress = Math.round((window.scrollY / totalHeight) * 100);
-      setScrollProgress((prev) => (prev === progress ? prev : progress));
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Active section tracking via IntersectionObserver
   useEffect(() => {
@@ -230,14 +235,12 @@ const App = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Set initial project index properly once projects load
   useEffect(() => {
     if (projects && projects.length > 0) {
       setActiveProjectIndex(projects.length);
     }
   }, [projects]);
 
-  // Project carousel auto-scroll
   useEffect(() => {
     if (openpro !== null || !projects || projects.length === 0) return;
     const interval = setInterval(() => {
@@ -248,10 +251,9 @@ const App = () => {
     return () => clearInterval(interval);
   }, [openpro, projects]);
 
-  // Infinite loop teleport — FIXED TO USE DYNAMIC LENGTH
   useEffect(() => {
     if (!projects || projects.length === 0) return;
-    const len = projects.length; // Dynamic length from your API
+    const len = projects.length;
 
     if (activeProjectIndex >= len * 2 || activeProjectIndex < len) {
       const timer = setTimeout(() => {
@@ -642,17 +644,21 @@ const App = () => {
 
   return (
     <div className="relative w-full min-h-screen bg-[#0a0a0f] overflow-hidden">
-      <div className="fixed top-0 left-0 w-full h-full z-0">
-        <Particles
-          particleColors={["#818cf8", "#c084fc"]}
-          particleCount={isMobile ? 50 : 300}
-          particleSpread={8}
-          speed={0.15}
-          particleBaseSize={100}
-          moveParticlesOnHover={!isMobile}
-          alphaParticles={true}
-          disableRotation={false}
-        />
+      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none">
+        {showParticles && (
+          <Suspense fallback={null}>
+            <Particles
+              particleColors={["#818cf8", "#c084fc"]}
+              particleCount={isMobile ? 30 : 120} // Reduced particles for performance
+              particleSpread={8}
+              speed={0.15}
+              particleBaseSize={100}
+              moveParticlesOnHover={!isMobile}
+              alphaParticles={true}
+              disableRotation={false}
+            />
+          </Suspense>
+        )}
       </div>
       <Navbar />
       <AnimatePresence>
@@ -662,14 +668,7 @@ const App = () => {
           transition={{ duration: 1.2, ease: "easeOut" }}
           className="relative z-10"
         >
-          {/* Scroll Progress Bar */}
-          <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-slate-900/50">
-            <div
-              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 transition-[width] duration-150 scroll-progress"
-              style={{ width: `${scrollProgress}%` }}
-            />
-          </div>
-          
+
           {/* Hero Section */}
           <Element
             name="Home"
@@ -731,7 +730,7 @@ const App = () => {
                       duration={1200}
                       spy={true}
                       offset={-90}
-                      className="px-6 py-3 font-semibold rounded-xl ui-btn-primary ui-glow hover:scale-105 transition-transform duration-300"
+                      className="px-6 py-3 font-semibold rounded-xl ui-btn-primary ui-glow hover:scale-105 transition-transform duration-300 cursor-pointer"
                     >
                       ./contact.sh
                     </Link>
@@ -741,7 +740,7 @@ const App = () => {
                       duration={1200}
                       spy={true}
                       offset={-90}
-                      className="px-6 py-3 font-semibold rounded-xl ui-btn-ghost ui-glow"
+                      className="px-6 py-3 font-semibold rounded-xl ui-btn-ghost ui-glow cursor-pointer"
                     >
                       --view-projects
                     </Link>
@@ -772,9 +771,14 @@ const App = () => {
                   <div className="absolute bottom-4 left-4 w-3 h-3 border-b-2 border-l-2 border-indigo-400 rounded-bl-sm opacity-50"></div>
                   <div className="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-indigo-400 rounded-br-sm opacity-50"></div>
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-blue-900/10"></div>
+
+                  {/* --- PERFORMANCE OPTIMIZATION: LCP Image Prioritization --- */}
                   <img
                     src="./Profile_Photo1.png"
-                    alt="profilePic"
+                    alt="Hatim Malak Profile Photo"
+                    width="420"
+                    height="420"
+                    fetchPriority="high"
                     className="object-cover object-top w-full h-full rounded-full transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute -bottom-2 -right-2 bg-slate-800 border border-slate-600 px-4 py-2 rounded-md text-sm font-bold text-indigo-400 shadow-lg font-mono">
@@ -807,15 +811,15 @@ const App = () => {
               <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
                   {skills.map((category, categoryIndex) => (
+                    // --- PERFORMANCE OPTIMIZATION: Lazy loaded component ---
                     <Tilt
-                      key={categoryIndex}
-                      options={{
-                        max: 12,
-                        scale: 1.03,
-                        speed: 300,
-                        glare: true,
-                        "max-glare": 0.2,
-                      }}
+                      tiltEnable={!isMobile}
+                      tiltMaxAngleX={8}      
+                      tiltMaxAngleY={8}
+                      scale={1.02}           
+                      transitionSpeed={400}
+                      glareEnable={true}
+                      glareMaxOpacity={0.15} 
                       className="w-[340px] h-[380px] item-reveal"
                     >
                       <div className="bg-slate-900 border border-slate-700/50 w-[340px] h-[380px] rounded-xl backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden ui-glow">
@@ -833,22 +837,22 @@ const App = () => {
                             <h2 className="text-lg font-bold flex items-center gap-2">
                               <span className="text-indigo-400 font-mono">$</span>
                               <span className="text-indigo-300 font-mono truncate">
-                                {selectedSkill?.category === category.title 
-                                  ? selectedSkill.name 
+                                {selectedSkill?.category === category.title
+                                  ? selectedSkill.name
                                   : category.title}
                               </span>
                             </h2>
                             <div className="text-slate-600 text-[10px] font-mono mt-1">
-                              {selectedSkill?.category === category.title 
+                              {selectedSkill?.category === category.title
                                 ? `<-- Inspecting Detail />`
-                                : `<!-- ${category.items.length} items -->`}
+                                : ``}
                             </div>
                           </div>
 
                           <div className="flex-1 relative overflow-hidden">
                             <AnimatePresence mode="wait">
                               {selectedSkill?.category === category.title ? (
-                                <motion.div 
+                                <motion.div
                                   key="detail"
                                   initial={{ opacity: 0, y: 8 }}
                                   animate={{ opacity: 1, y: 0 }}
@@ -866,6 +870,9 @@ const App = () => {
                                       <img
                                         src={selectedSkill.icon}
                                         alt={selectedSkill.name}
+                                        width="32"
+                                        height="32"
+                                        loading="lazy"
                                         className="w-8 h-8 object-contain filter brightness-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]"
                                       />
                                     </motion.div>
@@ -949,6 +956,9 @@ const App = () => {
                                         <img
                                           src={item.icon}
                                           alt={item.name}
+                                          loading="lazy"
+                                          width="40"
+                                          height="40"
                                           className="object-contain transition-all duration-300 group-hover:scale-110 filter brightness-90 group-hover:brightness-100 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
                                           style={{
                                             width: item.size,
@@ -999,148 +1009,144 @@ const App = () => {
               onMouseEnter={() => { carouselHovered.current = true; }}
               onMouseLeave={() => { carouselHovered.current = false; }}
             >
-              {/* Carousel area with arrows */}
               <div className="relative w-full">
-              {/* Left Arrow */}
-              <button
-                onClick={() => setActiveProjectIndex((prev) => prev - 1)}
-                className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
-                aria-label="Previous project"
-              >
-                <ChevronLeft size={20} />
-              </button>
-
-              {/* Right Arrow */}
-              <button
-                onClick={() => setActiveProjectIndex((prev) => prev + 1)}
-                className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
-                aria-label="Next project"
-              >
-                <ChevronRight size={20} />
-              </button>
-
-              {/* Carousel Track — Skeletons or 3x looped array for infinite scroll */}
-              <div className="overflow-hidden w-full px-10 sm:px-12 md:px-16 py-8">
-                <div
-                  ref={trackRef}
-                  className="flex transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-                  style={{
-                    marginLeft: '50%',
-                    transform: `translateX(-${(isgettingProject ? 2 : activeProjectIndex) * (isMobile ? 312 : 372) + (isMobile ? 156 : 186)}px)`
-                  }}
+                <button
+                  onClick={() => setActiveProjectIndex((prev) => prev - 1)}
+                  className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                  aria-label="Previous project"
                 >
-                  {isgettingProject ? (
-                    /* --- SKELETON LOADER STATE --- */
-                    [0, 1, 2, 3, 4].map((index) => {
-                      const distance = Math.abs(index - 2); // Center the 3rd skeleton
-                      return (
-                        <div
-                          key={`skeleton-${index}`}
-                          className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
-                          style={{
-                            opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
-                            transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
-                            filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
-                          }}
-                        >
-                          <div className="w-full h-[480px] flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-sm animate-pulse">
-                            {/* Skeleton Header */}
-                            <div className="w-full bg-slate-800/60 px-3 py-3 border-b border-slate-700/50 flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
-                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
-                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
-                              <div className="ml-2 w-24 h-2 bg-slate-700 rounded"></div>
-                            </div>
-                            {/* Skeleton Image */}
-                            <div className="w-full h-[35%] bg-slate-800/40 border-b border-slate-700/50"></div>
-                            {/* Skeleton Content */}
-                            <div className="p-5 flex flex-col justify-start gap-4 items-start w-full flex-1">
-                              <div className="w-3/4 h-5 bg-slate-700/80 rounded"></div>
-                              <div className="w-1/3 h-2 bg-slate-800 rounded"></div>
-                              <div className="w-full space-y-2 mt-2">
-                                <div className="w-full h-3 bg-slate-800 rounded"></div>
-                                <div className="w-full h-3 bg-slate-800 rounded"></div>
-                                <div className="w-5/6 h-3 bg-slate-800 rounded"></div>
-                              </div>
-                              {/* Skeleton Chips */}
-                              <div className="flex flex-wrap gap-2 mt-auto">
-                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
-                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
-                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    /* --- ACTUAL PROJECTS LOADED STATE --- */
-                    projects && projects.length > 0 && [...projects, ...projects, ...projects].map((pro, index) => {
-                      const distance = Math.abs(index - activeProjectIndex);
-                      return (
-                        <div
-                          key={`${pro.id}-${index}`}
-                          className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
-                          style={{
-                            opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
-                            transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
-                            filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
-                          }}
-                        >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <button
+                  onClick={() => setActiveProjectIndex((prev) => prev + 1)}
+                  className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                  aria-label="Next project"
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                <div className="overflow-hidden w-full px-10 sm:px-12 md:px-16 py-8">
+                  <div
+                    ref={trackRef}
+                    className="flex transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                    style={{
+                      marginLeft: '50%',
+                      transform: `translateX(-${(isgettingProject ? 2 : activeProjectIndex) * (isMobile ? 312 : 372) + (isMobile ? 156 : 186)}px)`
+                    }}
+                  >
+                    {isgettingProject ? (
+                      [0, 1, 2, 3, 4].map((index) => {
+                        const distance = Math.abs(index - 2);
+                        return (
                           <div
-                            onClick={() => setopenpro(pro.id)}
-                            className="w-full h-[480px] transition-colors flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow"
+                            key={`skeleton-${index}`}
+                            className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
+                            style={{
+                              opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
+                              transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
+                              filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
+                            }}
                           >
-                            <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
-                              <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
-                              <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
-                              <span className="ml-2 text-slate-400">{(pro.title || 'untitled').toLowerCase().replace(/\s+/g, '')}.jsx</span>
-                            </div>
-                            <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
-                              <img
-                                src={pro.desktop_url || pro.img}
-                                alt="pro"
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                              <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
-                                ./view_details.sh
+                            <div className="w-full h-[480px] flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-sm animate-pulse">
+                              <div className="w-full bg-slate-800/60 px-3 py-3 border-b border-slate-700/50 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                                <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                                <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                                <div className="ml-2 w-24 h-2 bg-slate-700 rounded"></div>
                               </div>
-                            </div>
-                            <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
-                              <h1 className="text-xl text-white font-bold font-mono text-indigo-300 line-clamp-1">
-                                {pro.title || pro.name}
-                              </h1>
-                              <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
-                                // {Object.keys(pro.languages || pro.skills || {}).length} technologies used
-                              </div>
-                              <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
-                                {pro.description}
-                              </p>
-                              <div className="flex flex-wrap gap-2 mt-auto">
-                                {Object.keys(pro.languages || pro.skills || {}).slice(0, 3).map((language) => (
-                                  <div
-                                    key={language}
-                                    className="ui-chip ui-glow"
-                                  >
-                                    [{language}]
-                                  </div>
-                                ))}
-                                {Object.keys(pro.languages || pro.skills || {}).length > 3 && (
-                                  <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
-                                    +{Object.keys(pro.languages || pro.skills || {}).length - 3}
-                                  </div>
-                                )}
+                              <div className="w-full h-[35%] bg-slate-800/40 border-b border-slate-700/50"></div>
+                              <div className="p-5 flex flex-col justify-start gap-4 items-start w-full flex-1">
+                                <div className="w-3/4 h-5 bg-slate-700/80 rounded"></div>
+                                <div className="w-1/3 h-2 bg-slate-800 rounded"></div>
+                                <div className="w-full space-y-2 mt-2">
+                                  <div className="w-full h-3 bg-slate-800 rounded"></div>
+                                  <div className="w-full h-3 bg-slate-800 rounded"></div>
+                                  <div className="w-5/6 h-3 bg-slate-800 rounded"></div>
+                                </div>
+                                <div className="flex flex-wrap gap-2 mt-auto">
+                                  <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                                  <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                                  <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })
-                  )}
+                        );
+                      })
+                    ) : (
+                      projects && projects.length > 0 && [...projects, ...projects, ...projects].map((pro, index) => {
+                        const distance = Math.abs(index - activeProjectIndex);
+                        return (
+                          <div
+                            key={`${pro.id}-${index}`}
+                            className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
+                            style={{
+                              opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
+                              transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
+                              filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
+                            }}
+                          >
+                            <div
+                              onClick={() => setopenpro(pro.id)}
+                              className="w-full h-[480px] transition-colors flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow"
+                            >
+                              <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
+                                <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
+                                <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
+                                <span className="ml-2 text-slate-400">{(pro.title || 'untitled').toLowerCase().replace(/\s+/g, '')}.jsx</span>
+                              </div>
+                              <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
+
+                                {/* --- PERFORMANCE OPTIMIZATION: explicit image size & lazy load --- */}
+                                <img
+                                  src={pro.desktop_url || pro.img}
+                                  alt={`${pro.title || 'project'} cover`}
+                                  width="340"
+                                  height="200"
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                                <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
+                                  ./view_details.sh
+                                </div>
+                              </div>
+                              <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
+                                <h1 className="text-xl text-white font-bold font-mono text-indigo-300 line-clamp-1">
+                                  {pro.title || pro.name}
+                                </h1>
+                                <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
+                                // {Object.keys(pro.languages || pro.skills || {}).length} technologies used
+                                </div>
+                                <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
+                                  {pro.description}
+                                </p>
+                                <div className="flex flex-wrap gap-2 mt-auto">
+                                  {Object.keys(pro.languages || pro.skills || {}).slice(0, 3).map((language) => (
+                                    <div
+                                      key={language}
+                                      className="ui-chip ui-glow"
+                                    >
+                                      [{language}]
+                                    </div>
+                                  ))}
+                                  {Object.keys(pro.languages || pro.skills || {}).length > 3 && (
+                                    <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
+                                      +{Object.keys(pro.languages || pro.skills || {}).length - 3}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
-              </div>
               </div>
 
               {/* Dot indicators */}
@@ -1157,8 +1163,7 @@ const App = () => {
                   />
                 ))}
               </div>
-              
-              {/* Modal Portals */}
+
               {/* Modal Portals */}
               {openpro !== null &&
                 createPortal(
@@ -1167,11 +1172,9 @@ const App = () => {
                     onClick={() => setopenpro(null)}
                   >
                     <div
-                      // 1. FIXED HEIGHT: Added h-[85vh] and max-h-[800px] to enforce a strict box size
                       className="w-full max-w-4xl h-[80vh] max-h-[800px] bg-slate-900 text-white rounded-xl flex flex-col overflow-hidden shadow-2xl border border-slate-700 font-mono text-sm relative ui-glow"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* Header - Shrink-0 keeps it from squishing */}
                       <div className="w-full bg-slate-800/80 border-b border-slate-700/50 flex items-center justify-between pr-2 sm:pr-4 shrink-0">
                         <div className="flex items-center h-full">
                           <div className="flex items-center gap-2 px-4 border-r border-slate-700/50 h-full py-3 sm:py-4">
@@ -1196,10 +1199,7 @@ const App = () => {
                         </button>
                       </div>
 
-                      {/* 2. BODY WRAPPER: Removed overflow-y-auto, added min-h-0 and overflow-hidden */}
                       <div className="flex flex-col lg:flex-row w-full flex-1 overflow-hidden min-h-0">
-                        
-                        {/* Line Numbers */}
                         <div className="hidden lg:flex flex-col items-center py-4 bg-slate-900/50 border-r border-slate-800/80 text-slate-700 font-mono text-xs w-10 select-none shrink-0 overflow-hidden">
                           {Array.from({ length: 20 }).map((_, i) => (
                             <div key={i} className="my-[4px]">{i + 1}</div>
@@ -1207,18 +1207,22 @@ const App = () => {
                         </div>
 
                         <div className="flex flex-col lg:flex-row w-full flex-1 min-h-0">
-                          {/* 3. IMAGE AREA: Fixed height on mobile, full height on desktop, non-scrollable */}
                           <div className="lg:w-[40%] w-full h-[200px] sm:h-[250px] lg:h-full relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4 shrink-0 flex flex-col">
                             <div className="w-full h-full lg:rounded-lg overflow-hidden lg:border border-slate-700">
+
+                              {/* --- PERFORMANCE OPTIMIZATION: explicit modal image sizing --- */}
                               <img
                                 src={selectedProject?.desktop_url || selectedProject?.img}
-                                alt="project"
+                                alt="project detailed view"
+                                width="600"
+                                height="400"
+                                loading="lazy"
+                                decoding="async"
                                 className="h-full w-full object-cover"
                               />
                             </div>
                           </div>
 
-                          {/* 4. TEXT AREA: Added overflow-y-auto here so ONLY this side scrolls! */}
                           <div className="lg:w-[60%] w-full p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1">
                             <h1 className="text-xl sm:text-2xl font-bold text-indigo-300 break-words">
                               <span className="text-pink-500">const</span> {(selectedProject?.title || selectedProject?.name || "untitled").replace(/\s+/g, '')} <span className="text-slate-400">=</span> <span className="text-yellow-300">&#123;</span>
@@ -1313,16 +1317,20 @@ const App = () => {
                 <div className="text-indigo-400 mb-4 font-mono text-sm self-start">$ gh api user/contributions</div>
                 <div className="w-full bg-slate-950/50 p-4 rounded-lg border border-slate-800/50 overflow-x-auto hide-scrollbar">
                   <div className="min-w-[750px] flex justify-center items-center mx-auto">
-                    <GitHubCalendar
-                      username="Hatim-Malak"
-                      blockSize={13}
-                      blockMargin={4}
-                      colorScheme="dark"
-                      fontSize={14}
-                      theme={{
-                        dark: ['#1e293b', '#4f46e540', '#4f46e580', '#4f46e5c0', '#4f46e5']
-                      }}
-                    />
+
+                    {/* --- PERFORMANCE OPTIMIZATION: Lazy loaded GitHub Calendar --- */}
+                    <Suspense fallback={<div className="min-w-[750px] h-[150px] bg-slate-800/50 animate-pulse rounded-xl"></div>}>
+                      <GitHubCalendar
+                        username="Hatim-Malak"
+                        blockSize={13}
+                        blockMargin={4}
+                        colorScheme="dark"
+                        fontSize={14}
+                        theme={{
+                          dark: ['#1e293b', '#4f46e540', '#4f46e580', '#4f46e5c0', '#4f46e5']
+                        }}
+                      />
+                    </Suspense>
                   </div>
                 </div>
               </div>
@@ -1357,6 +1365,9 @@ const App = () => {
                     <img
                       src="https://streak-stats.demolab.com?user=Hatim-Malak&theme=nord&hide_border=true&background=00000000&ring=818cf8&fire=818cf8&currStreakLabel=818cf8"
                       alt="GitHub Streak Stats"
+                      loading="lazy"
+                      width="400"
+                      height="150"
                       className="w-full h-auto object-contain max-w-[400px]"
                     />
                   </div>
@@ -1417,9 +1428,15 @@ const App = () => {
 
                     <div className="flex items-start gap-4 mb-3 border-b border-slate-800/50 pb-3">
                       <div className="w-12 h-12 bg-white/10 rounded-md overflow-hidden shrink-0 border border-slate-700 mt-1">
+
+                        {/* --- PERFORMANCE OPTIMIZATION: explicit dimension & lazy load --- */}
                         <img
                           src={edu.img}
                           alt={edu.school}
+                          width="48"
+                          height="48"
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
                       </div>
