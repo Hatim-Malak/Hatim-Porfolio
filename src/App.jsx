@@ -873,6 +873,7 @@ const App = () => {
                                         width="32"
                                         height="32"
                                         loading="lazy"
+                                        decoding="async"
                                         className="w-8 h-8 object-contain filter brightness-110 drop-shadow-[0_0_8px_rgba(99,102,241,0.4)]"
                                       />
                                     </motion.div>
@@ -957,6 +958,7 @@ const App = () => {
                                           src={item.icon}
                                           alt={item.name}
                                           loading="lazy"
+                                          decoding="async"
                                           width="40"
                                           height="40"
                                           className="object-contain transition-all duration-300 group-hover:scale-110 filter brightness-90 group-hover:brightness-100 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
