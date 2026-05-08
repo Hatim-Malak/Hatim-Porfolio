@@ -13,8 +13,9 @@ import {
   SiSwagger,
   SiLangchain,
 } from "react-icons/si";
-import { TbTopologyStar3 } from "react-icons/tb"; // Used for LangGraph
-import { FaBrain } from "react-icons/fa"; // Used for LangSmith
+import { useAgent } from "./store/useAgentStore.js";
+import { TbTopologyStar3 } from "react-icons/tb";
+import { FaBrain } from "react-icons/fa";
 import Navbar from "./components/Navbar.jsx";
 import { Element } from "react-scroll";
 import Tilt from "react-parallax-tilt";
@@ -25,13 +26,14 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import emailjs from "emailjs-com";
 import toast, { Toaster } from "react-hot-toast";
-import { Loader, ExternalLink, X, Github, Linkedin, Mail, ChevronLeft } from "lucide-react";
+import { Loader, ExternalLink, X, Github, Linkedin, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-scroll";
 import Footer from "./components/Footer.jsx";
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from "react-dom";
 import { GitHubCalendar } from 'react-github-calendar';
+
 const App = () => {
   const form = useRef();
   const [load, setload] = useState(false);
@@ -42,6 +44,9 @@ const App = () => {
 
   const [isMobile, setIsMobile] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0); // Changed to 0 initially
+  const carouselHovered = useRef(false);
+  const trackRef = useRef(null);
 
   const handleSkillClick = (item, categoryTitle) => {
     setSelectedSkill({ ...item, category: categoryTitle });
@@ -51,6 +56,12 @@ const App = () => {
     e.stopPropagation();
     setSelectedSkill(null);
   };
+
+  const { isgettingProject, getProject, projects } = useAgent();
+  
+  useEffect(() => {
+    getProject();
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -70,7 +81,6 @@ const App = () => {
         const userData = await userRes.json();
         const repoData = await repoRes.json();
 
-        // Calculate stars and languages
         const stars = repoData.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
         const langMap = {};
         let totalSize = 0;
@@ -90,7 +100,6 @@ const App = () => {
             percent: Math.max(1, Math.round((size / totalSize) * 100))
           }));
 
-        // SINGLE state update
         setGithubStats({
           repos: userData.public_repos || 0,
           followers: userData.followers || 0,
@@ -107,10 +116,8 @@ const App = () => {
     fetchData();
   }, []);
 
-  // Smooth global scrolling with Lenis
   // Smooth global scrolling with Lenis - DESKTOP ONLY
   useEffect(() => {
-    // Check if it's a mobile device (standard breakpoint)
     if (window.innerWidth < 768) return;
 
     const lenis = new Lenis({
@@ -139,7 +146,6 @@ const App = () => {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Section title/header reveals
     ScrollTrigger.batch(".section-reveal", {
       onEnter: (elements) => {
         gsap.fromTo(
@@ -159,7 +165,6 @@ const App = () => {
       once: true,
     });
 
-    // Individual card/item reveals with stagger
     ScrollTrigger.batch(".item-reveal", {
       onEnter: (elements) => {
         gsap.fromTo(
@@ -190,8 +195,6 @@ const App = () => {
       if (totalHeight <= 0) return;
 
       const progress = Math.round((window.scrollY / totalHeight) * 100);
-
-      // Only update if the integer value changed to prevent micro-renders
       setScrollProgress((prev) => (prev === progress ? prev : progress));
     };
 
@@ -204,7 +207,7 @@ const App = () => {
     const sections = ["Home", "Skills", "Projects", "GitHub", "Education", "Contact"];
     const observerOptions = {
       root: null,
-      rootMargin: "-20% 0px -70% 0px", // Adjusted margins for better accuracy
+      rootMargin: "-20% 0px -70% 0px",
       threshold: 0,
     };
 
@@ -213,7 +216,6 @@ const App = () => {
         if (entry.isIntersecting) {
           const sectionName = entry.target.getAttribute("id")?.replace("section-", "");
           if (sectionName) {
-            // CRITICAL: Only update if it's actually a different section
             setActiveSection((prev) => (prev === sectionName ? prev : sectionName));
           }
         }
@@ -227,6 +229,51 @@ const App = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  // Set initial project index properly once projects load
+  useEffect(() => {
+    if (projects && projects.length > 0) {
+      setActiveProjectIndex(projects.length);
+    }
+  }, [projects]);
+
+  // Project carousel auto-scroll
+  useEffect(() => {
+    if (openpro !== null || !projects || projects.length === 0) return;
+    const interval = setInterval(() => {
+      if (!carouselHovered.current) {
+        setActiveProjectIndex((prev) => prev + 1);
+      }
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [openpro, projects]);
+
+  // Infinite loop teleport — FIXED TO USE DYNAMIC LENGTH
+  useEffect(() => {
+    if (!projects || projects.length === 0) return;
+    const len = projects.length; // Dynamic length from your API
+
+    if (activeProjectIndex >= len * 2 || activeProjectIndex < len) {
+      const timer = setTimeout(() => {
+        if (trackRef.current) {
+          trackRef.current.style.transition = 'none';
+        }
+        setActiveProjectIndex((prev) => {
+          if (prev >= len * 2) return prev - len;
+          if (prev < len) return prev + len;
+          return prev;
+        });
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (trackRef.current) {
+              trackRef.current.style.transition = '';
+            }
+          });
+        });
+      }, 720);
+      return () => clearTimeout(timer);
+    }
+  }, [activeProjectIndex, projects]);
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -251,13 +298,14 @@ const App = () => {
         }
       );
   };
+
   const skills = [
     {
       title: "Frontend",
       items: [
-        { 
-          name: "HTML", 
-          icon: "./html1.png", 
+        {
+          name: "HTML",
+          icon: "./html1.png",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -266,9 +314,9 @@ const App = () => {
             experience: "Used for semantic markup, accessibility optimization, and SEO-friendly structure across all portfolio projects."
           }
         },
-        { 
-          name: "CSS", 
-          icon: "./css2.webp", 
+        {
+          name: "CSS",
+          icon: "./css2.webp",
           size: "34px",
           detail: {
             level: "Advanced",
@@ -277,9 +325,9 @@ const App = () => {
             experience: "Implemented complex animations, responsive layouts, and custom design systems. Comfortable with flexbox, grid, and modern CSS features."
           }
         },
-        { 
-          name: "JAVASCRIPT", 
-          icon: "./javascript.webp", 
+        {
+          name: "JAVASCRIPT",
+          icon: "./javascript.webp",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -288,9 +336,9 @@ const App = () => {
             experience: "Built real-time applications, asynchronous data handling, and DOM manipulation. Experienced with ES6+ features and modern async patterns."
           }
         },
-        { 
-          name: "REACT", 
-          icon: "./React-icon.svg.png", 
+        {
+          name: "REACT",
+          icon: "./React-icon.svg.png",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -299,9 +347,9 @@ const App = () => {
             experience: "Developed multiple full-stack applications using React. Experienced with hooks, context API, state management, and performance optimization."
           }
         },
-        { 
-          name: "TAILWIND CSS", 
-          icon: "./tailwindcss-icon.svg", 
+        {
+          name: "TAILWIND CSS",
+          icon: "./tailwindcss-icon.svg",
           size: "33px",
           detail: {
             level: "Advanced",
@@ -315,9 +363,9 @@ const App = () => {
     {
       title: "Backend",
       items: [
-        { 
-          name: "NODE.JS", 
-          icon: "./node.png", 
+        {
+          name: "NODE.JS",
+          icon: "./node.png",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -326,9 +374,9 @@ const App = () => {
             experience: "Built RESTful APIs, real-time servers, and backend services. Comfortable with event-driven architecture and non-blocking I/O."
           }
         },
-        { 
-          name: "EXPRESS.JS", 
-          icon: "./express-js.png", 
+        {
+          name: "EXPRESS.JS",
+          icon: "./express-js.png",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -337,9 +385,9 @@ const App = () => {
             experience: "Created multiple backend APIs with authentication, authorization, and database integration. Familiar with middleware patterns."
           }
         },
-        { 
-          name: "FASTAPI", 
-          icon: "./fastapi.svg", 
+        {
+          name: "FASTAPI",
+          icon: "./fastapi.svg",
           size: "40px",
           detail: {
             level: "Intermediate",
@@ -348,9 +396,9 @@ const App = () => {
             experience: "Used for building ML model serving APIs and data processing endpoints. Experienced with Pydantic validation and async patterns."
           }
         },
-        { 
-          name: "SOCKET.IO", 
-          icon: "./Socket-io.svg", 
+        {
+          name: "SOCKET.IO",
+          icon: "./Socket-io.svg",
           size: "40px",
           detail: {
             level: "Advanced",
@@ -359,9 +407,9 @@ const App = () => {
             experience: "Implemented real-time chat applications with live messaging, online status, and typing indicators."
           }
         },
-        { 
-          name: "SPRING BOOT", 
-          icon: "https://cdn.simpleicons.org/springboot/6DB33F", 
+        {
+          name: "SPRING BOOT",
+          icon: "https://cdn.simpleicons.org/springboot/6DB33F",
           size: "40px",
           detail: {
             level: "Intermediate",
@@ -375,9 +423,9 @@ const App = () => {
     {
       title: "Languages",
       items: [
-        { 
-          name: "C", 
-          icon: "./c.webp", 
+        {
+          name: "C",
+          icon: "./c.webp",
           size: "45px",
           detail: {
             level: "Intermediate",
@@ -386,10 +434,10 @@ const App = () => {
             experience: "Learned programming fundamentals through C. Implemented data structures, algorithms, and system-level programming concepts."
           }
         },
-        { 
-          name: "C++", 
-          icon: "./c++.png", 
-          size: "40px", 
+        {
+          name: "C++",
+          icon: "./c++.png",
+          size: "40px",
           height: "45px",
           detail: {
             level: "Intermediate",
@@ -398,10 +446,10 @@ const App = () => {
             experience: "Used for competitive programming and understanding OOP concepts. Comfortable with classes, templates, and STL."
           }
         },
-        { 
-          name: "JAVA", 
-          icon: "./java.png", 
-          size: "35px", 
+        {
+          name: "JAVA",
+          icon: "./java.png",
+          size: "35px",
           height: "50px",
           detail: {
             level: "Intermediate",
@@ -410,9 +458,9 @@ const App = () => {
             experience: "Used for building Spring Boot backend services, data structures, and algorithmic problem-solving. Comfortable with OOP and design patterns."
           }
         },
-        { 
-          name: "PYTHON", 
-          icon: "./python.png", 
+        {
+          name: "PYTHON",
+          icon: "./python.png",
           size: "35px",
           detail: {
             level: "Advanced",
@@ -426,9 +474,9 @@ const App = () => {
     {
       title: "Tools",
       items: [
-        { 
-          name: "GITHUB", 
-          icon: "./github.png", 
+        {
+          name: "GITHUB",
+          icon: "./github.png",
           size: "35px",
           detail: {
             level: "Advanced",
@@ -437,9 +485,9 @@ const App = () => {
             experience: "Daily use for version control, pull requests, code reviews, and CI/CD workflows. Manage multiple repositories and organizations."
           }
         },
-        { 
-          name: "FIGMA", 
-          icon: "./figma.webp", 
+        {
+          name: "FIGMA",
+          icon: "./figma.webp",
           size: "51px",
           detail: {
             level: "Intermediate",
@@ -448,9 +496,9 @@ const App = () => {
             experience: "Used for designing portfolio layouts, creating wireframes, and prototyping interactive UI components."
           }
         },
-        { 
-          name: "POSTMAN", 
-          icon: "./postman.webp", 
+        {
+          name: "POSTMAN",
+          icon: "./postman.webp",
           size: "35px",
           detail: {
             level: "Advanced",
@@ -459,9 +507,9 @@ const App = () => {
             experience: "Extensively used for API testing, debugging, and documentation. Created automated test collections for backend services."
           }
         },
-        { 
-          name: "SWAGGER", 
-          icon: "./swagger-logo.png", 
+        {
+          name: "SWAGGER",
+          icon: "./swagger-logo.png",
           size: "35px",
           detail: {
             level: "Intermediate",
@@ -470,9 +518,9 @@ const App = () => {
             experience: "Integrated Swagger/OpenAPI for automatic API documentation. Used for generating client SDKs and testing endpoints."
           }
         },
-        { 
-          name: "CLAUDE CODE", 
-          icon: "https://cdn.simpleicons.org/anthropic/D97757", 
+        {
+          name: "CLAUDE CODE",
+          icon: "https://cdn.simpleicons.org/anthropic/D97757",
           size: "35px",
           detail: {
             level: "Advanced",
@@ -481,9 +529,9 @@ const App = () => {
             experience: "Regularly use for code generation, debugging, explaining complex concepts, and accelerating development workflow."
           }
         },
-        { 
-          name: "ANTIGRAVITY", 
-          icon: "https://cdn.simpleicons.org/codemagic/white", 
+        {
+          name: "ANTIGRAVITY",
+          icon: "https://cdn.simpleicons.org/codemagic/white",
           size: "35px",
           detail: {
             level: "Intermediate",
@@ -497,9 +545,9 @@ const App = () => {
     {
       title: "AI Technologies",
       items: [
-        { 
-          name: "LANG CHAIN", 
-          icon: "./langchain.webp", 
+        {
+          name: "LANG CHAIN",
+          icon: "./langchain.webp",
           size: "45px",
           detail: {
             level: "Intermediate",
@@ -508,9 +556,9 @@ const App = () => {
             experience: "Built LLM-powered applications with retrieval-augmented generation (RAG), custom tools, and conversational agents."
           }
         },
-        { 
-          name: "LANG GRAPH", 
-          icon: "./langgraph (1).png", 
+        {
+          name: "LANG GRAPH",
+          icon: "./langgraph (1).png",
           size: "45px",
           detail: {
             level: "Intermediate",
@@ -519,9 +567,9 @@ const App = () => {
             experience: "Implementing agentic workflows with memory, tool use, and multi-step reasoning capabilities."
           }
         },
-        { 
-          name: "LANG SMITH", 
-          icon: "./langsmith.png", 
+        {
+          name: "LANG SMITH",
+          icon: "./langsmith.png",
           size: "45px",
           detail: {
             level: "Beginner",
@@ -530,9 +578,9 @@ const App = () => {
             experience: "Using for tracing LangChain applications, evaluating model outputs, and improving prompt engineering."
           }
         },
-        { 
-          name: "CREW AI", 
-          icon: "https://cdn.simpleicons.org/probot/white", 
+        {
+          name: "CREW AI",
+          icon: "https://cdn.simpleicons.org/probot/white",
           size: "45px",
           detail: {
             level: "Intermediate",
@@ -544,128 +592,22 @@ const App = () => {
       ],
     },
   ];
+
   const techLogos = [
-    {
-      node: <SiMongodb className="text-white" />,
-      title: "MongoDB",
-      href: "https://www.mongodb.com",
-    },
-    {
-      node: <SiExpress className="text-white" />,
-      title: "Express.js",
-      href: "https://expressjs.com",
-    },
-    {
-      node: <SiReact className="text-white" />,
-      title: "React",
-      href: "https://react.dev",
-    },
-    {
-      node: <SiNodedotjs className="text-white" />,
-      title: "Node.js",
-      href: "https://nodejs.org",
-    },
-    {
-      node: <SiPython className="text-white" />,
-      title: "Python",
-      href: "https://www.python.org",
-    },
-
-    {
-      node: <SiGithub className="text-white" />,
-      title: "GitHub",
-      href: "https://github.com",
-    },
-    {
-      node: <SiFigma className="text-white" />,
-      title: "Figma",
-      href: "https://www.figma.com",
-    },
-    {
-      node: <SiLangchain className="text-white" />,
-      title: "LangChain",
-      href: "https://www.langchain.com",
-    },
-    {
-      node: <TbTopologyStar3 className="text-white" />,
-      title: "LangGraph",
-      href: "https://www.langchain.com/langgraph",
-    },
-    {
-      node: <FaBrain className="text-white" />,
-      title: "LangSmith",
-      href: "https://smith.langchain.com",
-    },
-    {
-      node: <SiPostman className="text-white" />,
-      title: "Postman",
-      href: "https://www.postman.com",
-    },
-    {
-      node: <SiSwagger className="text-white" />,
-      title: "Swagger",
-      href: "https://swagger.io",
-    },
+    { node: <SiMongodb className="text-white" />, title: "MongoDB", href: "https://www.mongodb.com" },
+    { node: <SiExpress className="text-white" />, title: "Express.js", href: "https://expressjs.com" },
+    { node: <SiReact className="text-white" />, title: "React", href: "https://react.dev" },
+    { node: <SiNodedotjs className="text-white" />, title: "Node.js", href: "https://nodejs.org" },
+    { node: <SiPython className="text-white" />, title: "Python", href: "https://www.python.org" },
+    { node: <SiGithub className="text-white" />, title: "GitHub", href: "https://github.com" },
+    { node: <SiFigma className="text-white" />, title: "Figma", href: "https://www.figma.com" },
+    { node: <SiLangchain className="text-white" />, title: "LangChain", href: "https://www.langchain.com" },
+    { node: <TbTopologyStar3 className="text-white" />, title: "LangGraph", href: "https://www.langchain.com/langgraph" },
+    { node: <FaBrain className="text-white" />, title: "LangSmith", href: "https://smith.langchain.com" },
+    { node: <SiPostman className="text-white" />, title: "Postman", href: "https://www.postman.com" },
+    { node: <SiSwagger className="text-white" />, title: "Swagger", href: "https://swagger.io" },
   ];
 
-  const projects = [
-    {
-      id: 0,
-      img: "./pro1.jpg",
-      name: "OfficalChat",
-      description: ` A real-time chat application built using React, Node.js,
-                  Express, Socket.IO, and TailwindCSS, deployed securely on
-                  Render. It enables instant bidirectional messaging with a
-                  responsive and modern UI for smooth cross-device
-                  communication. The backend efficiently handles live socket
-                  connections, ensuring fast and reliable performance. The
-                  project’s modular codebase allows easy expansion for future
-                  features like group chats, file sharing, and authentication.`,
-      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js", "Socket.io"],
-      code: "https://github.com/Hatim-Malak/officalchat",
-      live: "https://officalchat.onrender.com/",
-    },
-    {
-      id: 1,
-      img: "./pro2.jpg",
-      name: "Starlit Stationary",
-      description: ` A full-stack stationery e-commerce platform built using the
-                  MERN stack with TailwindCSS, deployed on Vercel and Railway.
-                  It features secure authentication, product browsing,
-                  category-based search, and a shopping cart with order
-                  management. An intuitive admin panel allows efficient product
-                  and order control, including user feedback-based order
-                  cancellation. The deployment ensures fast, scalable, and
-                  reliable performance with seamless database integration.`,
-      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
-      code: "https://github.com/Hatim-Malak/Starlit_Stationary-app",
-      live: "https://starlit-stationary-frontend.vercel.app/",
-    },
-    {
-      id: 2,
-      img: "./pro3.png",
-      name: "E-book Reader",
-      description: ` An interactive e-book reader application built using the MERN
-                  stack, allowing users to read books online seamlessly. It
-                  features a clean and responsive UI for distraction-free
-                  reading and smooth navigation between chapters. The platform
-                  ensures fast content loading, secure data handling, and
-                  scalable performance for an engaging digital reading
-                  experience.`,
-      skills: ["React.js", "Tailwindcss", "Node.js", "Express.js"],
-      code: "https://github.com/Hatim-Malak/E-book",
-      live: "https://e-book-psi-nine.vercel.app/",
-    },
-    {
-      id: 3,
-      img: "./routinex.png",
-      name: "RoutineX",
-      description: "RoutineX10 is a full-stack routine tracking application built with Java Spring Boot and a modern React frontend, designed to help users manage daily tasks, build consistent habits, and track productivity. It features secure JWT-based authentication with token blacklisting, a layered backend architecture (controllers, services, repositories, DTOs), and complete CRUD functionality for routine management with scheduling support. The app also provides analytics like daily tracking, 30-day history, and consistency insights, while using Zustand, Axios, and toast notifications on the frontend, along with Docker-ready deployment for scalability.",
-      skills:["React.js","Java Spring Boot","Docker","JWT","Zustand","Axios","Toast Notifications"],
-      code:"https://github.com/Hatim-Malak/RoutineX10",
-      live:"https://routinex10.vercel.app/"
-    }
-  ];
   const education = [
     {
       id: 1,
@@ -695,7 +637,9 @@ const App = () => {
       degree: "CBSE(X) - Science with Computer Application",
     },
   ];
-  const selectedProject = projects.find(p => p.id === openpro);
+
+  const selectedProject = projects?.find(p => p.id === openpro);
+
   return (
     <div className="relative w-full min-h-screen bg-[#0a0a0f] overflow-hidden">
       <div className="fixed top-0 left-0 w-full h-full z-0">
@@ -725,6 +669,8 @@ const App = () => {
               style={{ width: `${scrollProgress}%` }}
             />
           </div>
+          
+          {/* Hero Section */}
           <Element
             name="Home"
             id="section-Home"
@@ -821,12 +767,10 @@ const App = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-900 rounded-full blur-3xl opacity-20 animate-pulse"></div>
                 <div className="relative lg:size-[420px] lg2:size-[380px] md:size-[320px] size-[260px] rounded-full border-2 border-slate-700 border-t-indigo-500 shadow-[0_0_60px_rgba(99,102,241,0.3)] hover:shadow-[0_0_80px_rgba(99,102,241,0.5)] transition-all duration-500 group">
-                  {/* Corner decorations */}
                   <div className="absolute top-4 left-4 w-3 h-3 border-t-2 border-l-2 border-indigo-400 rounded-tl-sm opacity-50"></div>
                   <div className="absolute top-4 right-4 w-3 h-3 border-t-2 border-r-2 border-indigo-400 rounded-tr-sm opacity-50"></div>
                   <div className="absolute bottom-4 left-4 w-3 h-3 border-b-2 border-l-2 border-indigo-400 rounded-bl-sm opacity-50"></div>
                   <div className="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-indigo-400 rounded-br-sm opacity-50"></div>
-
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-blue-900/10"></div>
                   <img
                     src="./Profile_Photo1.png"
@@ -840,6 +784,8 @@ const App = () => {
               </div>
             </div>
           </Element>
+
+          {/* Skills Section */}
           <Element
             name="Skills"
             id="section-Skills"
@@ -873,7 +819,6 @@ const App = () => {
                       className="w-[340px] h-[380px] item-reveal"
                     >
                       <div className="bg-slate-900 border border-slate-700/50 w-[340px] h-[380px] rounded-xl backdrop-blur-sm hover:border-indigo-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col overflow-hidden ui-glow">
-                        {/* Terminal Title Bar */}
                         <div className="bg-slate-800/80 border-b border-slate-700/50 px-4 py-2 flex items-center justify-between shrink-0">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
@@ -883,9 +828,7 @@ const App = () => {
                           <span className="text-slate-500 text-xs font-mono">skills/{category.title.toLowerCase().replace(/\s+/g, '-')}.json</span>
                         </div>
 
-                        {/* Card Body — fixed remaining height */}
                         <div className="flex-1 flex flex-col overflow-hidden p-4">
-                          {/* Title Row */}
                           <div className="shrink-0 mb-3">
                             <h2 className="text-lg font-bold flex items-center gap-2">
                               <span className="text-indigo-400 font-mono">$</span>
@@ -902,7 +845,6 @@ const App = () => {
                             </div>
                           </div>
 
-                          {/* Content Area */}
                           <div className="flex-1 relative overflow-hidden">
                             <AnimatePresence mode="wait">
                               {selectedSkill?.category === category.title ? (
@@ -914,7 +856,6 @@ const App = () => {
                                   transition={{ duration: 0.25 }}
                                   className="flex flex-col absolute inset-0"
                                 >
-                                  {/* Icon + Progress bar — compact header */}
                                   <div className="flex gap-3 items-center shrink-0 mb-3">
                                     <motion.div
                                       initial={{ scale: 0.6 }}
@@ -948,7 +889,6 @@ const App = () => {
                                     </div>
                                   </div>
 
-                                  {/* Description + Experience — scrollable */}
                                   <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                                     <motion.div
                                       initial={{ opacity: 0, y: 6 }}
@@ -979,7 +919,6 @@ const App = () => {
                                     </motion.div>
                                   </div>
 
-                                  {/* Back button — always visible at bottom */}
                                   <motion.button
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -1034,6 +973,8 @@ const App = () => {
               </div>
             </div>
           </Element>
+
+          {/* Projects Section */}
           <Element
             name="Projects"
             id="section-Projects"
@@ -1054,70 +995,183 @@ const App = () => {
               </div>
             </div>
 
-            <div className="relative flex lg:flex-row lg2:flex-row flex-col mt-5 gap-8 justify-center items-center w-full max-w-6xl transition-all">
-              {projects.map((pro) => (
-                <React.Fragment key={pro.id}>
-                  <div
-                    onClick={() => setopenpro(pro.id)}
-                    className="w-[340px] h-[480px] transition-all flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow item-reveal"
-                  >
-                    <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
-                      <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
-                      <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
-                      <span className="ml-2 text-slate-400">{pro.name.toLowerCase().replace(/\s+/g, '')}.jsx</span>
-                    </div>
-                    <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
-                      <img
-                        src={pro.img}
-                        alt="pro"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
-                      <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
-                        ./view_details.sh
-                      </div>
-                    </div>
-                    <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
-                      <h1 className="text-xl text-white font-bold font-mono text-indigo-300">
-                        {pro.name}
-                      </h1>
-                      <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
-                        // {pro.skills.length} technologies used
-                      </div>
-                      <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
-                        {pro.description}
-                      </p>
-                      <div className="flex flex-wrap gap-2 mt-auto">
-                        {pro.skills.slice(0, 3).map((skill) => (
+            <div className="relative w-full max-w-6xl mt-5 flex flex-col items-center"
+              onMouseEnter={() => { carouselHovered.current = true; }}
+              onMouseLeave={() => { carouselHovered.current = false; }}
+            >
+              {/* Carousel area with arrows */}
+              <div className="relative w-full">
+              {/* Left Arrow */}
+              <button
+                onClick={() => setActiveProjectIndex((prev) => prev - 1)}
+                className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Previous project"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              {/* Right Arrow */}
+              <button
+                onClick={() => setActiveProjectIndex((prev) => prev + 1)}
+                className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 border border-slate-700/50 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Next project"
+              >
+                <ChevronRight size={20} />
+              </button>
+
+              {/* Carousel Track — Skeletons or 3x looped array for infinite scroll */}
+              <div className="overflow-hidden w-full px-10 sm:px-12 md:px-16 py-8">
+                <div
+                  ref={trackRef}
+                  className="flex transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+                  style={{
+                    marginLeft: '50%',
+                    transform: `translateX(-${(isgettingProject ? 2 : activeProjectIndex) * (isMobile ? 312 : 372) + (isMobile ? 156 : 186)}px)`
+                  }}
+                >
+                  {isgettingProject ? (
+                    /* --- SKELETON LOADER STATE --- */
+                    [0, 1, 2, 3, 4].map((index) => {
+                      const distance = Math.abs(index - 2); // Center the 3rd skeleton
+                      return (
+                        <div
+                          key={`skeleton-${index}`}
+                          className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
+                          style={{
+                            opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
+                            transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
+                            filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
+                          }}
+                        >
+                          <div className="w-full h-[480px] flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden backdrop-blur-sm animate-pulse">
+                            {/* Skeleton Header */}
+                            <div className="w-full bg-slate-800/60 px-3 py-3 border-b border-slate-700/50 flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                              <span className="w-2 h-2 rounded-full bg-slate-700"></span>
+                              <div className="ml-2 w-24 h-2 bg-slate-700 rounded"></div>
+                            </div>
+                            {/* Skeleton Image */}
+                            <div className="w-full h-[35%] bg-slate-800/40 border-b border-slate-700/50"></div>
+                            {/* Skeleton Content */}
+                            <div className="p-5 flex flex-col justify-start gap-4 items-start w-full flex-1">
+                              <div className="w-3/4 h-5 bg-slate-700/80 rounded"></div>
+                              <div className="w-1/3 h-2 bg-slate-800 rounded"></div>
+                              <div className="w-full space-y-2 mt-2">
+                                <div className="w-full h-3 bg-slate-800 rounded"></div>
+                                <div className="w-full h-3 bg-slate-800 rounded"></div>
+                                <div className="w-5/6 h-3 bg-slate-800 rounded"></div>
+                              </div>
+                              {/* Skeleton Chips */}
+                              <div className="flex flex-wrap gap-2 mt-auto">
+                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                                <div className="w-16 h-6 bg-slate-800 rounded border border-slate-700/50"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    /* --- ACTUAL PROJECTS LOADED STATE --- */
+                    projects && projects.length > 0 && [...projects, ...projects, ...projects].map((pro, index) => {
+                      const distance = Math.abs(index - activeProjectIndex);
+                      return (
+                        <div
+                          key={`${pro.id}-${index}`}
+                          className={`shrink-0 ${isMobile ? 'w-[280px]' : 'w-[340px]'} mx-4 transition-all duration-700`}
+                          style={{
+                            opacity: distance === 0 ? 1 : distance === 1 ? 0.35 : 0.1,
+                            transform: `scale(${distance === 0 ? 1 : distance === 1 ? 0.88 : 0.78})`,
+                            filter: distance === 0 ? 'blur(0px)' : `blur(${Math.min(distance * 3, 6)}px)`,
+                          }}
+                        >
                           <div
-                            key={skill}
-                            className="ui-chip ui-glow"
+                            onClick={() => setopenpro(pro.id)}
+                            className="w-full h-[480px] transition-colors flex flex-col justify-start items-start bg-slate-900/80 border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-500/30 duration-300 group backdrop-blur-sm ui-glow"
                           >
-                            [{skill}]
+                            <div className="w-full bg-slate-800/60 px-3 py-2 text-indigo-400 text-xs font-mono border-b border-slate-700/50 flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-red-500/80"></span>
+                              <span className="w-2 h-2 rounded-full bg-yellow-500/80"></span>
+                              <span className="w-2 h-2 rounded-full bg-green-500/80"></span>
+                              <span className="ml-2 text-slate-400">{(pro.title || 'untitled').toLowerCase().replace(/\s+/g, '')}.jsx</span>
+                            </div>
+                            <div className="w-full h-[35%] relative overflow-hidden border-b border-slate-700/50">
+                              <img
+                                src={pro.desktop_url || pro.img}
+                                alt="pro"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                              <div className="absolute top-2 right-2 px-2 py-1 bg-indigo-600/90 text-white text-[10px] font-mono rounded backdrop-blur-sm">
+                                ./view_details.sh
+                              </div>
+                            </div>
+                            <div className="p-5 flex flex-col justify-start gap-2 items-start w-full flex-1">
+                              <h1 className="text-xl text-white font-bold font-mono text-indigo-300 line-clamp-1">
+                                {pro.title || pro.name}
+                              </h1>
+                              <div className="text-slate-500 text-xs font-mono ml-1 mb-1">
+                                // {Object.keys(pro.languages || pro.skills || {}).length} technologies used
+                              </div>
+                              <p className="w-full text-slate-400 text-sm leading-relaxed line-clamp-3 font-mono">
+                                {pro.description}
+                              </p>
+                              <div className="flex flex-wrap gap-2 mt-auto">
+                                {Object.keys(pro.languages || pro.skills || {}).slice(0, 3).map((language) => (
+                                  <div
+                                    key={language}
+                                    className="ui-chip ui-glow"
+                                  >
+                                    [{language}]
+                                  </div>
+                                ))}
+                                {Object.keys(pro.languages || pro.skills || {}).length > 3 && (
+                                  <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
+                                    +{Object.keys(pro.languages || pro.skills || {}).length - 3}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        ))}
-                        {pro.skills.length > 3 && (
-                          <div className="text-[10px] font-mono px-2 py-1 rounded bg-slate-800/50 text-slate-500 border border-slate-700/50 ui-glow">
-                            +{pro.skills.length - 3}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </React.Fragment>
-              ))}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+              </div>
+
+              {/* Dot indicators */}
+              <div className="flex justify-center gap-3 mt-2">
+                {projects && projects.length > 0 && projects.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveProjectIndex(index + projects.length)}
+                    className={`h-2 rounded-full transition-all duration-500 ${index === activeProjectIndex % projects.length
+                      ? 'bg-indigo-500 w-8 shadow-[0_0_10px_rgba(99,102,241,0.5)]'
+                      : 'bg-slate-600 w-2 hover:bg-slate-400'
+                      }`}
+                    aria-label={`Go to project ${index + 1}`}
+                  />
+                ))}
+              </div>
+              
+              {/* Modal Portals */}
+              {/* Modal Portals */}
               {openpro !== null &&
                 createPortal(
                   <div
-                    className="fixed inset-0 z-[99] flex justify-center items-center bg-black/70 backdrop-blur-md p-4 sm:p-6"
-                    onClick={() => setopenpro(null)} // 1. Click backdrop to close
+                    className="fixed inset-0 z-[99] flex justify-center items-center bg-black/70 backdrop-blur-md p-4 sm:p-6 pt-20"
+                    onClick={() => setopenpro(null)}
                   >
                     <div
-                      className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] bg-slate-900 text-white rounded-xl flex flex-col overflow-hidden shadow-2xl border border-slate-700 font-mono text-sm relative ui-glow"
-                      onClick={(e) => e.stopPropagation()} // 2. Prevent clicks inside from closing the modal
+                      // 1. FIXED HEIGHT: Added h-[85vh] and max-h-[800px] to enforce a strict box size
+                      className="w-full max-w-4xl h-[80vh] max-h-[800px] bg-slate-900 text-white rounded-xl flex flex-col overflow-hidden shadow-2xl border border-slate-700 font-mono text-sm relative ui-glow"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {/* Header - Stays fixed at the top */}
+                      {/* Header - Shrink-0 keeps it from squishing */}
                       <div className="w-full bg-slate-800/80 border-b border-slate-700/50 flex items-center justify-between pr-2 sm:pr-4 shrink-0">
                         <div className="flex items-center h-full">
                           <div className="flex items-center gap-2 px-4 border-r border-slate-700/50 h-full py-3 sm:py-4">
@@ -1126,14 +1180,13 @@ const App = () => {
                             <span className="w-3 h-3 rounded-full bg-green-500"></span>
                           </div>
                           <div className="bg-slate-900 border-r border-slate-700/50 px-3 sm:px-4 py-3 sm:py-4 text-indigo-400 text-xs flex items-center gap-2 truncate max-w-[150px] sm:max-w-none">
-                            <span className="text-slate-500">📄</span> {selectedProject?.name.toLowerCase().replace(/\s+/g, '')}.jsx
+                            <span className="text-slate-500">📄</span> {(selectedProject?.title || selectedProject?.name || "untitled").toLowerCase().replace(/\s+/g, '')}.jsx
                           </div>
                           <div className="px-4 py-3 text-slate-500 text-xs hidden sm:block">
                             package.json
                           </div>
                         </div>
 
-                        {/* 3. Larger touch target for mobile close button */}
                         <button
                           onClick={() => setopenpro(null)}
                           className="p-2 mr-1 rounded-md text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-all"
@@ -1143,32 +1196,32 @@ const App = () => {
                         </button>
                       </div>
 
-                      {/* Scrollable Content Area */}
-                      <div className="flex flex-col lg:flex-row w-full flex-1 overflow-y-auto">
-
-                        {/* Line Numbers (Desktop only) */}
-                        <div className="hidden lg:flex flex-col items-center py-4 bg-slate-900/50 border-r border-slate-800/80 text-slate-700 font-mono text-xs w-10 select-none shrink-0">
+                      {/* 2. BODY WRAPPER: Removed overflow-y-auto, added min-h-0 and overflow-hidden */}
+                      <div className="flex flex-col lg:flex-row w-full flex-1 overflow-hidden min-h-0">
+                        
+                        {/* Line Numbers */}
+                        <div className="hidden lg:flex flex-col items-center py-4 bg-slate-900/50 border-r border-slate-800/80 text-slate-700 font-mono text-xs w-10 select-none shrink-0 overflow-hidden">
                           {Array.from({ length: 20 }).map((_, i) => (
                             <div key={i} className="my-[4px]">{i + 1}</div>
                           ))}
                         </div>
 
-                        <div className="flex flex-col lg:flex-row w-full">
-                          {/* Image Area - 4. Adjusted mobile height */}
-                          <div className="lg:w-[40%] w-full h-[200px] sm:h-[250px] lg:h-auto relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4 shrink-0">
+                        <div className="flex flex-col lg:flex-row w-full flex-1 min-h-0">
+                          {/* 3. IMAGE AREA: Fixed height on mobile, full height on desktop, non-scrollable */}
+                          <div className="lg:w-[40%] w-full h-[200px] sm:h-[250px] lg:h-full relative border-b lg:border-b-0 lg:border-r border-slate-700/50 bg-slate-800/40 p-0 lg:p-4 shrink-0 flex flex-col">
                             <div className="w-full h-full lg:rounded-lg overflow-hidden lg:border border-slate-700">
                               <img
-                                src={selectedProject?.img}
+                                src={selectedProject?.desktop_url || selectedProject?.img}
                                 alt="project"
                                 className="h-full w-full object-cover"
                               />
                             </div>
                           </div>
 
-                          {/* Text/Details Area - 4. Adjusted padding for mobile */}
-                          <div className="lg:w-[60%] w-full p-4 sm:p-6 flex flex-col gap-3 sm:gap-4">
+                          {/* 4. TEXT AREA: Added overflow-y-auto here so ONLY this side scrolls! */}
+                          <div className="lg:w-[60%] w-full p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 overflow-y-auto flex-1">
                             <h1 className="text-xl sm:text-2xl font-bold text-indigo-300 break-words">
-                              <span className="text-pink-500">const</span> {selectedProject?.name.replace(/\s+/g, '')} <span className="text-slate-400">=</span> <span className="text-yellow-300">&#123;</span>
+                              <span className="text-pink-500">const</span> {(selectedProject?.title || selectedProject?.name || "untitled").replace(/\s+/g, '')} <span className="text-slate-400">=</span> <span className="text-yellow-300">&#123;</span>
                             </h1>
 
                             <div className="pl-3 sm:pl-4 lg:pl-6 border-l border-slate-700/50">
@@ -1179,26 +1232,22 @@ const App = () => {
                               <div className="text-green-400 mt-1 text-xs sm:text-sm">`</div>
                             </div>
 
-                            <div className="text-slate-500 text-xs mt-2 pl-3 sm:pl-4 lg:pl-6">// {selectedProject?.skills.length} technologies used</div>
+                            <div className="text-slate-500 text-xs mt-2 pl-3 sm:pl-4 lg:pl-6">// {Object.keys(selectedProject?.languages || selectedProject?.skills || {}).length} technologies used</div>
 
                             <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-3 sm:pl-4 lg:pl-6">
-                              {selectedProject?.skills.map((skill) => (
-                                <div
-                                  key={skill}
-                                  className="px-2 py-1 bg-slate-800/70 rounded border border-slate-700/50 text-indigo-300 text-[10px] sm:text-xs ui-glow"
-                                >
-                                  [{skill}]
+                              {Object.keys(selectedProject?.languages || selectedProject?.skills || {}).map((language) => (
+                                <div key={language} className="px-2 py-1 bg-slate-800/70 rounded border border-slate-700/50 text-indigo-300 text-[10px] sm:text-xs ui-glow">
+                                  [{language}]
                                 </div>
                               ))}
                             </div>
 
                             <div className="text-yellow-300 text-xl sm:text-2xl font-bold mt-auto pt-4 mb-2">&#125;</div>
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2 shrink-0">
                               <a
                                 className="flex-1 bg-slate-800/70 text-slate-300 text-center py-2.5 sm:py-3 text-sm shadow-md rounded-md hover:bg-slate-700/80 transition-all border border-slate-600 flex items-center justify-center gap-2 ui-glow"
-                                href={selectedProject?.code}
+                                href={selectedProject?.github_link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
@@ -1206,7 +1255,7 @@ const App = () => {
                               </a>
                               <a
                                 className="flex-1 bg-indigo-600/20 text-indigo-300 text-center py-2.5 sm:py-3 text-sm shadow-md rounded-md hover:bg-indigo-600/30 transition-all border border-indigo-500/30 flex items-center justify-center gap-2 ui-glow"
-                                href={selectedProject?.live}
+                                href={selectedProject?.live_link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
@@ -1223,6 +1272,7 @@ const App = () => {
             </div>
           </Element>
 
+          {/* GitHub Section */}
           <Element
             name="GitHub"
             id="section-GitHub"
@@ -1316,6 +1366,7 @@ const App = () => {
             </div>
           </Element>
 
+          {/* Education Section */}
           <Element
             name="Education"
             id="section-Education"
@@ -1389,6 +1440,8 @@ const App = () => {
               ))}
             </div>
           </Element>
+
+          {/* Contact Section */}
           <Element
             name="Contact"
             id="section-Contact"
@@ -1410,7 +1463,6 @@ const App = () => {
             </div>
 
             <div className="w-full flex lg:flex-row flex-col gap-12 items-start justify-center">
-              {/* Left side: Form */}
               <div className="lg:w-1/2 w-full flex justify-center lg:justify-end">
                 <form
                   ref={form}
@@ -1474,7 +1526,6 @@ const App = () => {
                 </form>
               </div>
 
-              {/* Right side: Resume and social links */}
               <div className="lg:w-1/2 w-full flex flex-col items-center lg:items-start justify-start gap-8 lg:pl-10">
                 <div className="w-full max-w-[500px] flex flex-col gap-6">
                   <div className="bg-slate-900/60 border border-slate-700/50 rounded-xl p-6 font-mono shadow-[0_0_20px_rgba(99,102,241,0.05)] w-full ui-glow">
