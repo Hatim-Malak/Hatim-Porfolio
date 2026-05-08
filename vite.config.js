@@ -7,10 +7,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Split these heavy libraries into their own files
           vendor: ['react', 'react-dom'],
           animations: ['framer-motion', 'gsap'],
-          particles: ['react-tsparticles']
+          // We removed the react-tsparticles line from here!
+          three: ['three', '@react-three/fiber', '@react-three/drei'] // I noticed you have Three.js, so we can split that instead!
         }
       }
     }
