@@ -797,7 +797,7 @@ const App = () => {
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-blue-900/10"></div>
 
                   <img
-                    src="./Profile_Photo1.png"
+                    src="./Profile_Photo1.webp"
                     alt="Hatim Malak Profile Photo"
                     width="420"
                     height="420"
